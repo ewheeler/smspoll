@@ -52,7 +52,7 @@ class Question(models.Model):
 class Answer(models.Model):
 	question = models.ForeignKey(Question)
 	text = models.CharField(max_length=30)
-    choice = models.CharField(max_length=1)
+	choice = models.CharField(max_length=1)
 
 	def __unicode__(self):
 		return "(%s) %s" % (self.choice, self.text)
