@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>SMS Poll :: {% block title %}{% endblock %}</title>
+		<link type="text/css" rel="stylesheet" href="/assets/style.css" />
+		<meta name="author" content="UNICEF" />
+	</head>
+	<body>
+		<div id="header">
+			<h1>SMS Poll</h1>
+			<ul>
+				<li><a href="/">Dashboard</a></li>
+				<li><a href="/add">Add a Question</a></li>
+				<li><a href="/log">Message Log</a></li>
+			</ul>
+		</div>
+		<div id="inner">
+			{% block content %}{% endblock %}
+		</div>
+		<div id="footer">
+			<p class="rights">
+				Copyright &copy; 2007 UNICEF. All Rights Reserved.<br /> This software is available
+				under the <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">AGPL</a>.
+			</p>
+		</div>
+	</body>
+</html>

@@ -1,20 +1,23 @@
 import os
-from django.conf.urls.defaults import *
 
-# Uncomment the next two lines to enable the admin:
+import poll.views as pv
+
+# magic admin stuff (remove during prod)
+from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^webui/', include('webui.foo.urls')),
+
+	# serve assets via django, during development
 	(r'^assets/(?P<path>.*)$', "django.views.static.serve",
-        {"document_root": os.path.dirname(__file__) + "/static"}),
+        {"document_root": os.path.dirname(__file__) + "/assets"}),
 
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+	# poll views (move to poll/urls.py)
+	(r'^$',    pv.dashboard),
+	(r'^add$', pv.add_question),
+	(r'^log$', pv.message_log),
 
-    # Uncomment the next line to enable the admin:
+    # enable the django magic admin
     (r'^admin/(.*)', admin.site.root),
 )
