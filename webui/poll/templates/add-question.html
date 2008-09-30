@@ -1,5 +1,40 @@
 {% extends "layout.html" %}
 {% block title %}Add a Question{% endblock %}
 {% block content %}
-add a question
+
+<form method="post">
+	<div>
+		<label for="id_type">Question Type:</label>
+		<select name="type" id="id_type">
+			<option value="F">Free text</option>
+			<option value="B">Boolean</option>
+			<option value="M">Multiple choice</option>
+		</select>
+	</div>
+	
+	<div>
+		<label for="fm-start">Start Date:</label>
+		<input type="text" name="start" id="fm-start" maxlength="16" size="16" />
+	</div>
+
+	<div>
+		<label for="fm-end">End Date:</label>
+		<input type="text" name="end" id="fm-end" maxlength="16" size="16" />
+	</div>
+
+	<div>
+		<label for="fm-text">Question:</label>
+		<textarea id="fm-text" name="text" rows="3" cols="30"></textarea>
+	</div>
+	
+	<div class="submit">
+		<input type="submit" value="Add Question" />
+	</div>
+</form>
+
+<script type="text/javascript">
+	window.addEvent('domready', function() {
+		new Calendar({ "fm-start": "Y-m-d", "fm-end": "Y-m-d" });
+	});
+</script>
 {% endblock %}

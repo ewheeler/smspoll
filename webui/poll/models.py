@@ -33,8 +33,8 @@ class Question(models.Model):
 		('M', 'Multiple choice'),
 	)
 
-	start = models.DateTimeField()
-	end = models.DateTimeField()
+	start = models.DateField()
+	end = models.DateField()
 	text = models.CharField(max_length=160)
 	type = models.CharField(max_length=1, choices=QUESTION_TYPES)
 
