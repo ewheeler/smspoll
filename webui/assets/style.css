@@ -52,11 +52,44 @@ body {
 	padding: 2em;
 }
 
-	#inner h2 {
-		font-size: 160%;
-		font-weight: normal;
-		margin: 0.625em 0; /* 1em @ fs100% */
+	#inner div.questions {
+		background: #eee;
+		overflow-x: scroll;
+		padding: 0.5em;
 	}
+		
+		#inner div.questions div.wrap {
+			overflow: auto;
+		}
+	
+			#inner div.questions div.wrap div {
+				margin-right: 0.5em;
+				background: #fff;
+				float: left;
+			}
+		
+				#inner div.questions img {
+					display: block;
+					width: 160px;
+					height: 120px;
+				}
+				
+				#inner div.questions h2,
+				#inner div.questions p.dates {
+					text-align: center;
+					font-size: 80%;
+					width: 160px;
+				}
+				
+				#inner div.questions h2 {
+					font-weight: normal;
+					line-height: 1.4;
+				}
+		
+				#inner div.questions p.dates {
+					padding-bottom: 0.3125em; /* 0.25em @ fs100% */
+					color: #aaa;
+				}
 	
 	#inner form { }
 	
@@ -64,9 +97,12 @@ body {
 			margin-bottom: 0.25em;
 			clear: both;
 		}
+			
+			#inner form option {
+				padding-right: 10px; }
 		
 			#inner form label {
-				margin-top: 0.25em;
+				margin-top: 0.5em;
 				text-align: right;
 				padding-right: 1em;
 				display: block;

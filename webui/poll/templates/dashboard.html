@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-dashboard!
+{% load utils %}
+
+<div class="questions">
+	<div class="wrap">
+		{% for q in questions %}
+		{% question_summary q %}
+		{% endfor %}
+	</div>
+</div>
 {% endblock %}
 

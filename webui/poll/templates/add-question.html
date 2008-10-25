@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Add a Question{% endblock %}
 {% block content %}
+{% load utils %}
 
 <form method="post">
 	<div>
@@ -14,17 +15,17 @@
 	
 	<div>
 		<label for="fm-start">Start Date:</label>
-		<input type="text" name="start" id="fm-start" maxlength="16" size="16" />
+		{% date_selector "start" %}
 	</div>
 
 	<div>
 		<label for="fm-end">End Date:</label>
-		<input type="text" name="end" id="fm-end" maxlength="16" size="16" />
+		{% date_selector "end" %}
 	</div>
 
 	<div>
 		<label for="fm-text">Question:</label>
-		<textarea id="fm-text" name="text" rows="3" cols="30"></textarea>
+		<textarea id="fm-text" name="text" rows="4" cols="40"></textarea>
 	</div>
 	
 	<div class="submit">
