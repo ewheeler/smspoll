@@ -48,7 +48,7 @@ class App(SmsApplication):
 			res.save()
 			self.respond(STR["resubscribe"])
 		else:
-			res = Respondant.create(phone=caller, is_active=True)
+			Respondant.objects.create(phone=caller, is_active=True)
 			self.respond(STR["subscribe"])
 
 
@@ -102,33 +102,21 @@ class App(SmsApplication):
 	# without interfereing with dispatch
 	def before_incoming(self, caller, msg):
 		
-		# we will log the respondant, if we can identify
-		# them by their number. otherwise, log the number
-		res = self.__get(Respondant, phone=caller)
-		if res is None: ph = caller
-		else: ph = None
-		
 		# create a new log entry
 		Message.objects.create(
 			is_outgoing=False,
-			respondant=res,
-			message=msg)
+			phone=caller,
+			text=msg)
 	
 	
 	# as above...
-	def before_outgoing(self, recipient, msg):
-		
-		# we will log the monitor, if we can identify
-		# them by their number. otherwise, log the number
-		res = self.__get(Respondant, phone=recipient)
-		if res is None: ph = recipient
-		else: ph = None
+	def before_outgoing(self, caller, msg):
 		
 		# create a new log entry
 		Message.objects.create(
 			is_outgoing=True,
-			respondant=res,
-			message=msg)
+			phone=caller,
+			text=msg)
 
 
 app = App(backend=kannel, sender_args=["user", "pass"])
