@@ -1,4 +1,14 @@
-# Django settings for smspoll webui project.
+# find the root of this project,
+# so we can use relative paths
+# for our database and templates
+import os
+root = os.path.dirname(__file__)
+
+# add the parent directory to the python
+# path, so we can grab the shared libs
+import sys
+sys.path.append(os.path.dirname(root))
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
