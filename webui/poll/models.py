@@ -41,6 +41,13 @@ class Question(models.Model):
 	def __unicode__(self):
 		return self.text
 
+	def _get_current_question(self):
+		return  Question.objects.filter(
+							end__lt=date.today())\
+							.order_by('-end')[0]
+
+	current_question = property(_get_current_question)
+
 
 class Response(models.Model):
 	respondant = models.ForeignKey(Respondant, blank=True, null=True)
