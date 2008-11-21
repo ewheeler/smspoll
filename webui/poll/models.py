@@ -14,7 +14,7 @@ class Respondant(models.Model):
 
 
 class Message(models.Model):
-	respondant = models.ForeignKey(Respondant, blank=True, null=True)
+	phone = models.CharField(max_length=30, blank=True, null=True)
 	time = models.DateTimeField(auto_now_add=True)
 	text = models.CharField(max_length=160)
 	is_outgoing = models.BooleanField()
@@ -23,7 +23,7 @@ class Message(models.Model):
 	def __unicode__(self):
 		if self.is_outgoing: dir = ">>"
 		else:                dir = "<<"
-		return "%s %s: %s" % (dir, self.respondant, self.message)
+		return "%s %s: %s" % (dir, self.phone, self.message)
 
 
 class Question(models.Model):
