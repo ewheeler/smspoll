@@ -43,7 +43,7 @@ class Question(models.Model):
 
 	def _get_current_question(self):
 		return  Question.objects.filter(
-							end__lt=date.today())\
+							end__lte=date.today())\
 							.order_by('-end')[0]
 
 	current_question = property(_get_current_question)

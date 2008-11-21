@@ -1,12 +1,15 @@
+import os
 from django.conf.urls.defaults import *
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     # Example:
     # (r'^webui/', include('webui.foo.urls')),
+	(r'^assets/(?P<path>.*)$', "django.views.static.serve",
+        {"document_root": os.path.dirname(__file__) + "/static"}),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
