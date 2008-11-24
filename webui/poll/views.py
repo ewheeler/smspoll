@@ -16,7 +16,12 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 
 def graph_entries(q):
 	question = get_object_or_404(Question, pk=q.pk)
+
+	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
+	
+	# figure out what kind of question we have
+	# and make the appropriate graph
 	if answers:
 		if len(answers) > 2:
 			return graph_multiple_choice(question)
