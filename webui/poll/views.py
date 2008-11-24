@@ -28,21 +28,36 @@ def graph_entries(q):
 
 def graph_multiple_choice(q):
 	question = get_object_or_404(Question, pk=q.pk)
+	
+	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
+
+	# this is obnoxious but the best
+	# way python will allow making a
+	# dict from a list
 	choices = { " " : 0}
 	choices = choices.fromkeys(xrange(len(answers)), 0)
 
+	# grab the parsed entries for this question
 	entries = Entry.objects.filter(question=question,\
 					is_unparseable=False)
 
+	# i'm assuming here that the Entry.text is the
+	# same thing as the Answer.choice, presumably
+	# a number for each choice 1 through  n
+	# 
+	# iterate entries and tally the choices
 	for e in entries:
 		if int(e.text) in choices:
-			choices[int(e.text)] += 10
+			choices[int(e.text)] += 1
 
+	# collect the long, textual representation
+	# of the answer choice for labelling the graph
 	long_answers = []
 	for a in answers:
 		long_answers.append(a.text)
 
+	# configure and save the graph
 	bar = StackedVerticalBarChart(600,200)
 	bar.set_colours(['4d89f9','c6d9fd'])
 	bar.add_data(choices.values())
