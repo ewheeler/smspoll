@@ -23,7 +23,7 @@ class Message(models.Model):
 	def __unicode__(self):
 		if self.is_outgoing: dir = ">>"
 		else:                dir = "<<"
-		return "%s %s: %s" % (dir, self.phone, self.message)
+		return "%s %s: %s" % (dir, self.phone, self.text)
 
 
 class Question(models.Model):
