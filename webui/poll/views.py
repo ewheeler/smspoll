@@ -17,11 +17,14 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 def graph_entries(q):
 	question = get_object_or_404(Question, pk=q.pk)
 
+	# generate question participation graph
+	print graph_participation(q)
+
 	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
-	
+
 	# figure out what kind of question we have
-	# and make the appropriate graph
+	# and generate the appropriate graph
 	if answers:
 		if len(answers) > 2:
 			return graph_multiple_choice(question)
@@ -30,6 +33,28 @@ def graph_entries(q):
 	else:
 		return graph_free_text(question)
 
+
+def graph_participation(q):
+	question = get_object_or_404(Question, pk=q.pk)
+
+	# grab ALL entries for this question
+	entries = Entry.objects.filter(question=question)
+
+	# grab active respondants
+	respondants = Respondant.objects.filter(is_active=True)
+
+	# normalize data
+	pending = 100 * (1.0 - (float(len(entries))/float(len(respondants))))
+	participants = 100 - pending 
+
+	# configure and save the graph
+	pie = PieChart2D(275, 60)
+	pie.add_data([pending, participants])
+	pie.set_legend(['Pending' , 'Respondants'])
+	pie.set_colours(['0091C7','0FBBD0'])
+	pie.download('poll/graphs/participation.png')
+	
+	return 'saved participation.png'	
 
 def graph_multiple_choice(q):
 	question = get_object_or_404(Question, pk=q.pk)
@@ -104,6 +129,7 @@ def graph_boolean(q):
 
 	# configure and save the graph
 	pie = PieChart2D(275, 60)
+	# TODO normalize values
 	pie.add_data(choices.values())
 	pie.set_legend(long_answers)
 	pie.set_colours(['0091C7','0FBBD0'])
