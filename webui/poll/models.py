@@ -49,6 +49,15 @@ class Question(models.Model):
 	current_question = property(_get_current_question)
 
 
+class Answer(models.Model):
+	question = models.ForeignKey(Question)
+	text = models.CharField(max_length=30)
+    choice = models.CharField(max_length=1)
+
+	def __unicode__(self):
+		return "(%s) %s" % (self.choice, self.text)
+
+
 class Response(models.Model):
 	respondant = models.ForeignKey(Respondant, blank=True, null=True)
 	question = models.ForeignKey(Question, blank=True, null=True)
@@ -56,6 +65,7 @@ class Response(models.Model):
 	time = models.DateTimeField(auto_now_add=True)
 	text = models.CharField(max_length=160)
 	is_unparseable = models.BooleanField()
+	moderated = models.BooleanField()
 
 	def __unicode__(self):
 		return self.text
