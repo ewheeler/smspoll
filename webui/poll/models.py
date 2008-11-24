@@ -58,7 +58,7 @@ class Answer(models.Model):
 		return "(%s) %s" % (self.choice, self.text)
 
 
-class Response(models.Model):
+class Entry(models.Model):
 	respondant = models.ForeignKey(Respondant, blank=True, null=True)
 	question = models.ForeignKey(Question, blank=True, null=True)
 	message = models.ForeignKey(Message, blank=True, null=True)
@@ -69,3 +69,6 @@ class Response(models.Model):
 
 	def __unicode__(self):
 		return self.text
+
+	class Meta:
+		verbose_name_plural="Entries"
