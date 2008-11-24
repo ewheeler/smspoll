@@ -73,7 +73,43 @@ def graph_multiple_choice(q):
 
 
 def graph_boolean(q):
-	return 'called graph_boolean'	
+	# this method is not very DRY with respect to
+	# graph_multiple_choice
+	# will probably combine these once we figure
+	# out how they will be used
+
+	question = get_object_or_404(Question, pk=q.pk)
+	
+	# collect answers to this question
+	answers = Answer.objects.filter(question=question)
+
+	# only two choices unless we accept maybies
+	choices = { 0 : 0, 1 : 0 }
+
+	# grab the parsed entries for this question
+	entries = Entry.objects.filter(question=question,\
+					is_unparseable=False)
+
+	# i'm assuming here that the Entry.text is the
+	# same thing as the Answer.choice, presumably
+	# 0 for false/no and 1 for true/yes
+	# 
+	# iterate entries and tally the choices
+	for e in entries:
+		if int(e.text) in choices:
+			choices[int(e.text)] += 1
+	
+	# only two choices unless we accept maybies
+	long_answers = ["Nay", "Yea"]
+
+	# configure and save the graph
+	pie = PieChart2D(275, 60)
+	pie.add_data(choices.values())
+	pie.set_legend(long_answers)
+	pie.set_colours(['0091C7','0FBBD0'])
+	pie.download('poll/graphs/boolean.png')
+	
+	return 'saved boolean.png'	
 
 
 def graph_free_text(q):
