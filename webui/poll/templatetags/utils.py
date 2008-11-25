@@ -21,5 +21,10 @@ def date_selector(prefix):
 
 @register.inclusion_tag("partials/question-summary.html")
 def question_summary(question):
-	return {"question": question }
+	return { "question" : question }
 
+
+@register.inclusion_tag("partials/add-answer.html")
+def add_answer(number):
+	return { "questions" : Question.objects.all(),\
+				"number" : number }
