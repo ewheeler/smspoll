@@ -13,6 +13,9 @@ urlpatterns = patterns('',
 	(r'^assets/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/assets"}),
 
+    (r'^graphs/(?P<path>.*)$', "django.views.static.serve",
+        {"document_root": os.path.dirname(__file__) + "/poll/graphs"}),
+
 	# poll views (move to poll/urls.py)
 	(r'^$',    pv.dashboard),
 	(r'^add$', pv.add_question),

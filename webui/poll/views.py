@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # vim: noet
+import os, sys
+from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect
 from models import *
 from utils import *
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(ROOT, '..'))
+
+GRAPH_DIR = 'poll/graphs/'
 
 def dashboard(req):
 	return render_to_response("dashboard.html", { "questions": Question.objects.all() })
@@ -32,21 +38,6 @@ def add_question(req):
 def message_log(req):
 	return render_to_response("message-log.html")
 
-
-
-
-import os, sys
-from datetime import date, datetime
-
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, get_object_or_404
-
-from webui.poll.models import *
-
-from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
-
-ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ROOT, '..'))
 
 def graph_entries(q):
 	question = get_object_or_404(Question, pk=q.pk)
@@ -86,9 +77,10 @@ def graph_participation(q):
 	pie.add_data([pending, participants])
 	pie.set_legend(['Pending' , 'Respondants'])
 	pie.set_colours(['0091C7','0FBBD0'])
-	pie.download('poll/graphs/participation.png')
+	filename = GRAPH_DIR + str(question.pk) + '-participation.png'
+	pie.download(filename)
 	
-	return 'saved participation.png'	
+	return 'saved ' + filename	
 
 def graph_multiple_choice(q):
 	question = get_object_or_404(Question, pk=q.pk)
@@ -126,9 +118,10 @@ def graph_multiple_choice(q):
 	bar.set_colours(['4d89f9','c6d9fd'])
 	bar.add_data(choices.values())
 	bar.set_axis_labels(Axis.BOTTOM, long_answers)
-	bar.download('poll/graphs/multiple_choice.png')
+	filename = GRAPH_DIR + str(question.pk) + '-graph.png'
+	bar.download(filename)
 	
-	return 'saved multiple_choice.png'
+	return 'saved ' + filename	
 
 
 def graph_boolean(q):
@@ -167,9 +160,10 @@ def graph_boolean(q):
 	pie.add_data(choices.values())
 	pie.set_legend(long_answers)
 	pie.set_colours(['0091C7','0FBBD0'])
-	pie.download('poll/graphs/boolean.png')
+	filename = GRAPH_DIR + str(question.pk) + '-graph.png'
+	pie.download(filename)
 	
-	return 'saved boolean.png'	
+	return 'saved ' + filename	
 
 
 def graph_free_text(q):

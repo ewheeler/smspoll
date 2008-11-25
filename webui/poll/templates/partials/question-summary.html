@@ -1,5 +1,5 @@
 <div title="{{ question.text }}">
-	<img src="http://www.free-slideshow.com/screens/cheerful_monkeys/cheerful-monkey.jpg" />
+	<img src="/graphs/{{question.pk}}-graph.png"/>
 	<h2>{{ question.text|truncatewords:5 }}</h2>
 	<p class="dates">{{ question.start|date:"M dS" }} - {{ question.end|date:"M dS" }}</p>
 </div>
