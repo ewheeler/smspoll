@@ -1,5 +1,6 @@
 <div title="{{ question.text }}">
 	<img src="/graphs/{{question.pk}}-graph.png"/>
+	<img src="/graphs/{{question.pk}}-participation.png"/>
 	<h2>{{ question.text|truncatewords:5 }}</h2>
 	<p class="dates">{{ question.start|date:"M dS" }} - {{ question.end|date:"M dS" }}</p>
 </div>
