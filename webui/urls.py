@@ -19,6 +19,7 @@ urlpatterns = patterns('',
 	# poll views (move to poll/urls.py)
 	(r'^$',    pv.dashboard),
 	(r'^add$', pv.add_question),
+	(r'^add-answer$', pv.add_answer),
 	(r'^log$', pv.message_log),
 
     # enable the django magic admin
