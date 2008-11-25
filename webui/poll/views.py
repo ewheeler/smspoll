@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 
 GRAPH_DIR = 'poll/graphs/'
 
+
 def dashboard(req):
 	return render_to_response("dashboard.html", { "questions": Question.objects.all() })
 
@@ -81,6 +82,7 @@ def graph_participation(q):
 	pie.download(filename)
 	
 	return 'saved ' + filename	
+
 
 def graph_multiple_choice(q):
 	question = get_object_or_404(Question, pk=q.pk)
