@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Add an Answer{% endblock %}
+{% block content %}
+{% load utils %}
+
+<form method="post">
+	<div>
+		<label for="id_question">Question:</label>
+		<select name="question" id="id_question">
+		{% for q in questions %}
+			<option value="{{ q.pk }}">{{ q }}</option>
+		{% endfor %}
+		</select>
+	</div>
+	
+	<div>
+		<label for="fm-choice">Choice:</label>
+		<textarea id="fm-choice" name="choice" rows="1" cols="10"></textarea>
+	</div>
+
+	<div>
+		<label for="fm-text">Answer:</label>
+		<textarea id="fm-text" name="text" rows="1" cols="40"></textarea>
+	</div>
+
+	<div class="submit">
+		<input type="submit" value="Add Answer" />
+	</div>
+</form>
+
+{% endblock %}
