@@ -36,6 +36,23 @@ def add_question(req):
 	return render_to_response("add-question.html")
 
 
+def add_answer(req):
+	if req.method == "POST":
+		post = querydict_to_dict(req.POST)
+
+		post["question"] = Question.objects.get(pk=(int(post.pop("question"))))
+
+		# create the object and redirect to dashboard
+		# no error checking for now, except django's
+		# model and database constraints
+		Answer(**post).save()
+		return HttpResponseRedirect("/")
+	
+	# render the ADD form
+	return render_to_response("add-answer.html",\
+		{ "questions" : Question.objects.all() })
+
+
 def message_log(req):
 	return render_to_response("message-log.html")
 
@@ -67,10 +84,13 @@ def graph_participation(q):
 	entries = Entry.objects.filter(question=question)
 
 	# grab active respondants
-	respondants = Respondant.objects.filter(is_active=True)
+	# TODO this will be inaccurate for older questions
+	# and should find only respondants that were active
+	# for this question
+	all_respondants = Respondant.objects.filter(is_active=True)
 
 	# normalize data
-	pending = 100 * (1.0 - (float(len(entries))/float(len(respondants))))
+	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
 	participants = 100 - pending 
 
 	# configure and save the graph
@@ -93,7 +113,7 @@ def graph_multiple_choice(q):
 	# this is obnoxious but the best
 	# way python will allow making a
 	# dict from a list
-	choices = { " " : 0}
+	choices = { " " : 0 }
 	choices = choices.fromkeys(xrange(len(answers)), 0)
 
 	# grab the parsed entries for this question
