@@ -70,15 +70,15 @@ body {
 		
 				#inner div.questions img {
 					display: block;
-					width: 160px;
-					height: 120px;
+					width: 300px;
+					height: 100px;
 				}
 				
 				#inner div.questions h2,
 				#inner div.questions p.dates {
 					text-align: center;
 					font-size: 80%;
-					width: 160px;
+					width: 300px;
 				}
 				
 				#inner div.questions h2 {

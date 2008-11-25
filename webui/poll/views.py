@@ -73,7 +73,7 @@ def graph_participation(q):
 	participants = 100 - pending 
 
 	# configure and save the graph
-	pie = PieChart2D(275, 60)
+	pie = PieChart2D(300, 100)
 	pie.add_data([pending, participants])
 	pie.set_legend(['Pending' , 'Respondants'])
 	pie.set_colours(['0091C7','0FBBD0'])
@@ -114,7 +114,7 @@ def graph_multiple_choice(q):
 		long_answers.append(a.text)
 
 	# configure and save the graph
-	bar = StackedVerticalBarChart(600,200)
+	bar = StackedVerticalBarChart(300,100)
 	bar.set_colours(['4d89f9','c6d9fd'])
 	bar.add_data(choices.values())
 	bar.set_axis_labels(Axis.BOTTOM, long_answers)
@@ -155,7 +155,7 @@ def graph_boolean(q):
 	long_answers = ["Nay", "Yea"]
 
 	# configure and save the graph
-	pie = PieChart2D(275, 60)
+	pie = PieChart2D(300, 100)
 	# TODO normalize values
 	pie.add_data(choices.values())
 	pie.set_legend(long_answers)
