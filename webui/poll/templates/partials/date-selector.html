@@ -1,6 +1,6 @@
 <select name="{{ prefix }}-day">
 	{% for d, sel in days %}
-	<option{% if sel %} selected="selected"{% endif %}>{{ d }}</option>
+	<option value="{{ d }}"{% if sel %} selected="selected"{% endif %}>{{ d }}</option>
 	{% endfor %}
 </select>
 
@@ -10,6 +10,6 @@
 
 <select name="{{ prefix }}-year">
 	{% for y, sel in years %}
-	<option{% if sel %} selected="selected"{% endif %}>{{ y }}</option>
+	<option value="{{ y }}"{% if sel %} selected="selected"{% endif %}>{{ y }}</option>
 	{% endfor %}
 </select>

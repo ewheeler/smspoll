@@ -4,7 +4,8 @@ import os, sys
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseServerError
+from django.db import IntegrityError
 from models import *
 from utils import *
 
@@ -15,25 +16,41 @@ GRAPH_DIR = 'poll/graphs/'
 
 
 def dashboard(req):
-	return render_to_response("dashboard.html", { "questions": Question.objects.all() })
+	ques = Question.current()
+	entries = ques.entry_set.all()
+	prev = Question.objects.all()[:12]
+	
+	return render_to_response("dashboard.html", {
+		"question": ques,
+		"previous": prev,
+		"entries": entries,
+		"tab": "dashboard"
+	})
 
 
 def add_question(req):
-	if req.method == "POST":
-		post = querydict_to_dict(req.POST)
-		
-		# replace the key/values of the six <select> boxes (D/M/Y for start+end) with a single date field
-		post["start"] = "%4d-%02d-%02d" % (int(post.pop("start-year")), int(post.pop("start-month")), int(post.pop("start-day")))
-		post["end"]   = "%4d-%02d-%02d" % (int(post.pop("end-year")),   int(post.pop("end-month")), int(post.pop("end-day")))		
-		
-		# create the object and redirect to dashboard
-		# no error checking for now, except django's
-		# model and database constraints
-		Question(**post).save()
-		return HttpResponseRedirect("/")
 	
-	# render the ADD form
-	return render_to_response("add-question.html")
+	# if we are POSTing, create the object and redirect 
+	# to the dashboard. no error checking for now, except
+	# django's model and database constraints
+	if req.method == "POST":
+		try:
+			print req.POST
+			object_from_querydict(Question, req.POST).save()
+			return HttpResponseRedirect("/")
+		
+		# something went wrong during object creation.
+		# this should have been caught by javascript,
+		# so halt with a low-tech error
+		except IntegrityError, err:
+			return HttpResponseServerError(
+				"\n".join(list(e[1] for e in err)),
+				content_type="text/plain")
+	
+	# otherwise, just render the ADD form
+	return render_to_response("add-question.html", {
+		"tab": "add-question"
+	})
 
 
 def add_answer(req):

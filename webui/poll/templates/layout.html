@@ -5,16 +5,15 @@
 	<head>
 		<title>SMS Poll :: {% block title %}{% endblock %}</title>
 		<link type="text/css" rel="stylesheet" href="/assets/style.css" />
-		<link type="text/css" rel="stylesheet" href="/assets/calendar.css" />
 		<script type="text/javascript" src="/assets/mootools-1.2-core-yc.js"></script>
-		<script type="text/javascript" src="/assets/calendar-compat-rc4.js"></script>
+		<script type="text/javascript" src="/assets/application.js"></script>
 	</head>
 	<body>
 		<div id="header">
 			<h1>SMS Poll</h1>
 			<ul>
-				<li><a href="/">Dashboard</a></li>
-				<li><a href="/add">Add a Question</a></li>
+				<li{% ifequal tab "dashboard" %} class="active"{% endifequal %}><a href="/">Dashboard</a></li>
+				<li{% ifequal tab "add-question" %} class="active"{% endifequal %}><a href="/add">Add a Question</a></li>
 				<li><a href="/add-answer">Add an Answer</a></li>
 				<li><a href="/log">Message Log</a></li>
 			</ul>

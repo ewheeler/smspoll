@@ -1,7 +1,7 @@
-<div title="{{ question.text }}">
+<div title="{{ question.text }}" class="q-summ">
 	<img src="/graphs/{{question.pk}}-graph.png"/>
-	<img src="/graphs/{{question.pk}}-participation.png"/>
-	<h2>{{ question.text|truncatewords:5 }}</h2>
-	<p class="dates">{{ question.start|date:"M dS" }} - {{ question.end|date:"M dS" }}</p>
+	<!--<img src="/graphs/{{question.pk}}-participation.png"/>-->
+	<h3>{{ question.text|truncatewords:6 }}</h3>
+	<p class="dates">{{ question.start|date:"M dS y" }} - {{ question.end|date:"M dS y" }}</p>
 </div>
 

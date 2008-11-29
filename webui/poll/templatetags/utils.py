@@ -24,6 +24,11 @@ def question_summary(question):
 	return { "question" : question }
 
 
+@register.inclusion_tag("partials/question-full.html")
+def question_full(question):
+	return { "question" : question }
+
+
 @register.inclusion_tag("partials/add-answer.html")
 def add_answer(number):
 	return { "questions" : Question.objects.all(),\
