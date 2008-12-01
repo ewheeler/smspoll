@@ -16,7 +16,7 @@ def blast_numbers(numbers, message):
         return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
 
 def querydict_to_dict(qd):
-	if isintance(qd, Dict): return qd
+	if isinstance(qd, dict): return qd
 	return dict((str(k), v) for k, v in qd.iteritems())
 
 
