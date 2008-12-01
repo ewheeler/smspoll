@@ -67,6 +67,7 @@ body {
 				border-bottom-color: #fff;
 			}
 
+
 /* -----
    FORMS
    ----- */
@@ -125,7 +126,7 @@ form { }
 			border: 1px solid #0a0;
 			background: #afa;
 		}
-		
+
 
 
 
@@ -137,7 +138,7 @@ form { }
 
 	.q-full img {
 		display: block;
-		background: red;
+		background: #eee;
 		margin: 0.5em 0;
 		width: 100%;
 	}
@@ -162,18 +163,27 @@ form { }
 	}
 
 
+
+
 /* -------------------------
    PARTIAL: QUESTION SUMMARY
    ------------------------- */
 		
 .q-summ { }
-
+	
+	.q-summ a {
+		display: block;
+		outline: none;
+		text-decoration: none;
+	}
+	
 	.q-summ img {
 		display: block;
 		width: 240px;
 		height: 100px;
 		background: #fff;
 		margin-bottom: 0.25em;
+		border: 0;
 	}
 	
 	.q-summ h3,
@@ -191,7 +201,11 @@ form { }
 	.q-summ h3 {
 		margin-bottom: 0.3125em; /* =0.25em */
 		font-weight: normal;
+		color: #000;
 	}
+	
+		.q-summ a:focus	h3 {
+			text-decoration: underline; }
 
 	.q-summ p.dates {
 		color: #aaa; }
@@ -293,7 +307,7 @@ form { }
 		
 		.dashboard #answers li {
 			display: block;
-			border: 1px solid #eee;
+			border: 1px solid #ccc;
 			margin-top: 0.5em;
 		}
 		
@@ -460,6 +474,50 @@ form { }
 	
 	.add-question #grp-answers.disabled table {
 		opacity: 0.4; }
+
+
+
+
+/* -------------
+   PAGE: MSG LOG
+   ------------- */
+
+.msg-log { }
+
+	.msg-log td {
+		border: 1px solid #ccc;
+		padding: 0.5em;
+	}
+	
+		/* color rows according to their direction */
+		.msg-log tr.in  td { background: #efe; }
+		.msg-log tr.out td { background: #fee; }
+		
+		.msg-log td.dir {
+			font-weight: bold;
+			text-align: center;
+		}
+		
+			.msg-log tr.in  td.dir { color: #080; }
+			.msg-log tr.out td.dir { color: #800; }
+		
+	/* styled after <h2>
+	 * hon the dashboard */
+	.msg-log th {
+		padding: 0.5em;
+		text-align: left;
+		background: #f8f8f8;
+		font-weight: normal;
+		border-bottom: 2px solid #aaa;
+		margin-right: 1em;
+	}
+	
+		/* the top right corner doesn't contain
+		 * anything, so is (sort-of) hidden */
+		.msg-log th.null {
+			background: none;
+			border: none;
+		}
 
 
 

@@ -15,10 +15,22 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 GRAPH_DIR = 'poll/graphs/'
 
 
-def dashboard(req):
-	ques = Question.current()
-	entries = ques.entry_set.all()
+def dashboard(req, id=None):
+
+	# if a pk was passed in the url, then
+	# load that; otherwise, attempt to load
+	# the currently-active question (or None)
+	if id is None: ques = Question.current()
+	else: ques = get_object_or_404(Question, pk=id)
+	
+	# the previous questions are always the same (for
+	# now); todo: show those adjacent to 'ques'
 	prev = Question.objects.all()[:12]
+	
+	# show all of the answers related to this
+	# question. these have already been filtered
+	# by the backend, but not moderated
+	entries = ques.entry_set.all()
 	
 	return render_to_response("dashboard.html", {
 		"question": ques,
@@ -71,7 +83,9 @@ def add_answer(req):
 
 
 def message_log(req):
-	return render_to_response("message-log.html")
+	return render_to_response("message-log.html", {
+		"messages": Message.objects.all().order_by("-pk")
+	})
 
 
 def graph_entries(q):

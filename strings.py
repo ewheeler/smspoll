@@ -9,5 +9,8 @@ ENGLISH = {
 	"unsubscribe_unknkown": "Oops. You are not subscribed. Reply with 'join' to subscribe.",
 	"conv_welc": "You're welcome!",
 	"conv_greet": "Greetings, friend!",
-	"conv_swear": "Would you text that to your mother?"
+	"conv_swear": "Would you text that to your mother?",
+	"no_question": "There are no questions running right now",
+	"subscribe_pls": "Please subscribe before submitting answers",
+	"thanks": "Thank you for your response!"
 }

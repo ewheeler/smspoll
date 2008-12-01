@@ -12,6 +12,37 @@ class Respondant(models.Model):
 
 	def __unicode__(self):
 		return self.phone
+	
+	@classmethod
+	def subscribe(klass, caller, active=True):
+		created = False
+		
+		try:
+			# attempt to reactivate an
+			# unsubscribed respondant
+			r = klass.objects.get(phone=caller)
+			r.is_active = active
+			r.save()
+		
+		# no existing respondant, so create
+		# a new, pre-activated, respondant
+		except ObjectDoesNotExist:
+			r = klass.objects.create(phone=caller, is_active=active)
+			created = True
+		
+		# always return the object, with a bool
+		# "created" flat like get_or_create
+		return (r, created)
+	
+	@classmethod
+	def unsubscribe(klass, caller):
+		
+		# recycle the "subscribe" function to
+		# create and deactivate the respondant
+		return klass.subscribe(caller, False)
+		
+		
+		
 
 
 class Message(models.Model):

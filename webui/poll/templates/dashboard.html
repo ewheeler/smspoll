@@ -32,10 +32,22 @@
 		<h2>Previous Questions</h2>
 		<div class="scroll-box">{% if previous %}{% for q in previous %}{% if forloop.first %}
 			<div class="summaries num-{{ forloop.revcounter }}">{% endif %}
-				<div class="q-wrap {% if forloop.last %} last{% endif %}">
+				<div class="q-wrap {% if forloop.last %} last{% endif %}{% if question %}{% ifequal q.pk question.pk %} active{% endifequal %}{% endif %}">
 					{% question_summary q %}
 				</div>{% if forloop.last %}
-			</div>{% endif %}{% endfor %}{% else %}
+			</div>
+			<script type="text/javascript">
+				
+				/* if a question summary is "active" (ie, it has
+				 * been clicked on already), scroll it into view */
+				window.addEvent("domready", function() {
+					$$("#previous .active").each(function(el) {
+						var scroller = el.getParent(".scroll-box");
+						var pos = el.getPosition(scroller);
+						scroller.scrollTo((pos.x - 5), 0);
+					});
+				});
+			</script>{% endif %}{% endfor %}{% else %}
 			<div class="no-summaries">
 				This box will be useful once you
 				<a href="/add">Add a Question</a>.

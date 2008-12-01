@@ -23,7 +23,6 @@ from webui.poll.models import *
 class App(SmsApplication):
 	kw = SmsKeywords()
 
-
 	def __get(self, model, **kwargs):
 		try:
 			# attempt to fetch the object
@@ -35,65 +34,55 @@ class App(SmsApplication):
 			return None
 
 
-	# SUBSCRIBE -----------------------------------------------------------------
+	# SUBSCRIBE ---------------------------------------------------------------
+	
 	kw.prefix = ["subscribe", "join"]
 
 	@kw.blank()
 	@kw("(whatever)")
-	@kw.invalid()
 	def subscribe(self, caller, blah=None):
-		res = self.__get(Respondant, phone=caller)
-		if res: 
-			res.is_active = True 
-			res.save()
-			self.respond(STR["resubscribe"])
-		else:
-			Respondant.objects.create(phone=caller, is_active=True)
-			self.respond(STR["subscribe"])
-
-
-	# UNSUBSCRIBE -----------------------------------------------------------------
+		r, created = Respondant.subscribe(caller)
+		
+		# acknowledge with an appropriate message
+		if created: self.respond(STR["subscribe"])
+		else: self.respond(STR["resubscribe"])
+	
+	
+	# UNSUBSCRIBE -------------------------------------------------------------
+	
 	kw.prefix = ["unsubscribe", "leave", "stop", "exit"]
 
 	@kw.blank()
 	@kw("(whatever)")
-	@kw.invalid()
 	def unsubscribe(self, caller, blah=None):
-		res = self.__get(Respondant, phone=caller)
-		if res: 
-			res.is_active = False
-			res.save()
-			self.respond(STR["unsubscribe"])
-		else:
-			raise CallerError(STR["unsubscribe_unknown"])
-
-
-	# CONVERSATIONAL  ------------------------------------------------------------
-	kw.prefix = ["ok", "thanks", "thank you"]
+		r, created = Respondant.unsubscribe(caller)
+		self.respond(STR["unsubscribe"])
 	
-	@kw.blank()
-	@kw("(whatever)")
-	@kw.invalid()
-	def conv_welc(self, caller):
-		self.respond(STR["conv_welc"])
 	
+	# SUBMIT AN ANSWER --------------------------------------------------------
 
-	kw.prefix = ["hi", "hello", "howdy", "whats up"]
-
-	@kw.blank()
-	@kw("(whatever)")
-	@kw.invalid()
-	def conv_greet(self, caller, whatever=None):
-		self.respond(STR["conv_greet"])
-
-
-	kw.prefix = ["fuck", "damn", "shit", "bitch"]
-
-	@kw.blank()
-	@kw("(whatever)")
-	@kw.invalid()
-	def conv_swear(self, caller, whatever=None):
-			self.respond(STR["conv_swear"])
+	def incoming_sms(self, caller, msg):
+		# ensure that the caller is subscribed
+		r, created= Respondant.subscribe(caller)
+		
+		# if no question is currently running, then
+		# we can effectively ignore the incoming sms,
+		# but should notify the caller anyway
+		ques = Question.current()
+		if ques is None: self.respond(STR["no_question"])
+		
+		# if we are logging free text answers,
+		# just move the message straight into
+		# the entries (unmoderated!)
+		if ques.type == "F":
+			Entry.objects.create(
+				respondant=r,
+				question=ques,
+				message=self.log_msg,
+				is_unparseable=False,
+				moderated=False,
+				text=msg)
+			self.respond(STR["thanks"])
 
 
 	# LOGGING -----------------------------------------------------------------
@@ -103,10 +92,13 @@ class App(SmsApplication):
 	def before_incoming(self, caller, msg):
 		
 		# create a new log entry
+		self.log_msg =\
 		Message.objects.create(
 			is_outgoing=False,
 			phone=caller,
 			text=msg)
+		
+		
 	
 	
 	# as above...

@@ -12,12 +12,14 @@ urlpatterns = patterns('',
 	# serve assets via django, during development
 	(r'^assets/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/assets"}),
-
+	
+	# graphs are generated and stored to be viewed statically
     (r'^graphs/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/poll/graphs"}),
 
 	# poll views (move to poll/urls.py)
-	(r'^$',    pv.dashboard),
+	(r'^$', pv.dashboard),
+	(r'^question/(?P<id>\d+)$', pv.dashboard),
 	(r'^add$', pv.add_question),
 	(r'^add-answer$', pv.add_answer),
 	(r'^log$', pv.message_log),
