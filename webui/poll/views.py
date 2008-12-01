@@ -30,7 +30,8 @@ def dashboard(req, id=None):
 	# show all of the answers related to this
 	# question. these have already been filtered
 	# by the backend, but not moderated
-	entries = ques.entry_set.all()
+	if ques: entries = ques.entry_set.all()
+	else: entries = []
 	
 	return render_to_response("dashboard.html", {
 		"question": ques,
