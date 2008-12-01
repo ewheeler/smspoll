@@ -41,9 +41,6 @@ class Respondant(models.Model):
 		# create and deactivate the respondant
 		return klass.subscribe(caller, False)
 		
-		
-		
-
 
 class Message(models.Model):
 	phone = models.CharField(max_length=30, blank=True, null=True)
