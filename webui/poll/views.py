@@ -24,7 +24,7 @@ def dashboard(req, id=None):
 	else: ques = get_object_or_404(Question, pk=id)
 	
 	# the previous questions are always the same (for
-	# now); todo: show those adjacent to 'ques'
+	# now); TODO: show those adjacent to 'ques'
 	prev = Question.objects.all()[:12]
 	
 	# show all of the answers related to this
