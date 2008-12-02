@@ -131,8 +131,14 @@ def graph_participation(q):
 	# grab ALL entries for this question
 	entries = Entry.objects.filter(question=question)
 
+	# look up how many people were asked this question
+	# if None, use 0
+	if question.sent_to:
+		sent_to = question.sent_to
+	else: sent_to = 0
+
 	# normalize data
-	pending = 100 * (1.0 - (float(len(entries))/float(question.sent_to)))
+	pending = 100 * (1.0 - (float(len(entries))/float(sent_to)))
 	participants = 100 - pending 
 
 	for size in GRAPH_SIZES:
