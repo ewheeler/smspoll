@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 GRAPH_DIR = 'poll/graphs/'
 CURRENT_WIDTH = 500 
 
+
 def dashboard(req, id=None):
 
 	# if a pk was passed in the url, then
@@ -43,13 +44,25 @@ def dashboard(req, id=None):
 
 def add_question(req):
 	
-	# if we are POSTing, create the object and redirect 
-	# to the dashboard. no error checking for now, except
-	# django's model and database constraints
+	# if we are POSTing, create the object
+	# (and children) before redirecting
 	if req.method == "POST":
 		try:
-			print req.POST
-			object_from_querydict(Question, req.POST).save()
+			q = object_from_querydict(Question, req.POST)
+			q.save()
+			
+			# for multiple choice questions, also
+			# create the linked Answer objects
+			if q.type == "M":
+				for n in range(1, 5):
+					object_from_querydict(
+						Answer,
+						req.POST,
+						{ "question": q },
+						("-%s" % n)
+					).save()
+			
+			# redirect to the dashboard
 			return HttpResponseRedirect("/")
 		
 		# something went wrong during object creation.
