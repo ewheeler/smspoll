@@ -139,7 +139,7 @@ def graph_participation(q):
 		pie.download(filename)
 		print 'saved ' + filename
 
-	return 'saved ' + filename	
+	return 'graphed participation'
 
 
 def graph_multiple_choice(q):
@@ -185,7 +185,7 @@ def graph_multiple_choice(q):
 		bar.download(filename)
 		print 'saved ' + filename
 	
-	return 'saved ' + filename	
+	return 'graphed multiple choice'
 
 
 def graph_boolean(q):
@@ -229,7 +229,7 @@ def graph_boolean(q):
 		pie.download(filename)
 		print 'saved ' + filename
 	
-	return 'saved ' + filename	
+	return 'graphed boolean'
 
 
 def graph_free_text(q):
