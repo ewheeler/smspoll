@@ -3,22 +3,27 @@
 import os, sys
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
+from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.db import IntegrityError
+
 from models import *
 from utils import *
 
+# craziness to get the graphs to save in the right spot
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, '..'))
 
+# path, from above craziness, to graphs directory
 GRAPH_DIR = 'poll/graphs/'
+
+# graph sizes to generate (big & thumb)
 GRAPH_SIZES = ['500', '240']
 
 
 def golden(width):
 	return int(width/1.6180339887498948482)
-
 
 
 def dashboard(req, id=None):
@@ -84,6 +89,27 @@ def add_question(req):
 	})
 
 
+@require_POST
+def moderate(req, id, status):
+	ent = get_object_or_404(Entry, pk=id)
+	
+	# update the "moderated" status,
+	# which makes this a regular entry
+	if (status == "win"):
+		ent.moderated = True
+		ent.save()
+	
+	# remove bad entries from the db
+	# altogether. we'll still have the
+	# Message object to refer to
+	elif (status == "fail"):
+		ent.delete()
+	
+	# a really boring response. the HTTP code
+	# is all we really need on the client side
+	return HttpResponse("OK", content_type="text/plain")
+
+
 def add_answer(req):
 	if req.method == "POST":
 		post = querydict_to_dict(req.POST)
@@ -113,9 +139,6 @@ def graph_entries(q):
 	# generate question participation graph
 	print graph_participation(q)
 
-	# collect answers to this question
-	answers = Answer.objects.filter(question=question)
-
 	# figure out what kind of question we have
 	# and generate the appropriate graph
 	if question.type == 'M':
@@ -132,14 +155,16 @@ def graph_participation(q):
 	# grab ALL entries for this question
 	entries = Entry.objects.filter(question=question)
 
-	# grab active respondants
-	# TODO this will be inaccurate for older questions
-	# and should find only respondants that were active
-	# for this question
-	all_respondants = Respondant.objects.filter(is_active=True)
+	# look up how many people were asked this question
+	# and make a ratio
+	# if None, use 0
+	if question.sent_to:
+		participation = float(len(entries))/float(question.sent_to)
+	else: 
+		participation = 0.0
 
 	# normalize data
-	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
+	pending = 100 * (1.0 - participation)
 	participants = 100 - pending 
 
 	for size in GRAPH_SIZES:
@@ -152,7 +177,7 @@ def graph_participation(q):
 		pie.download(filename)
 		print 'saved ' + filename
 
-	return 'graphed participation'
+	return 'graphed participation ' + question.text
 
 
 def graph_multiple_choice(q):
@@ -161,9 +186,8 @@ def graph_multiple_choice(q):
 	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
 
-	# this is obnoxious but the best
-	# way python will allow making a
-	# dict from a list
+	# this is obnoxious but the easiest
+	# way to make a dict from a list
 	choices = { " " : 0 }
 	choices = choices.fromkeys(xrange(len(answers)), 0)
 
@@ -194,11 +218,11 @@ def graph_multiple_choice(q):
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
 		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
-		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		bar.download(filename)
 		print 'saved ' + filename
 	
-	return 'graphed multiple choice'
+	return 'graphed entries ' + question.text
 
 
 def graph_boolean(q):
@@ -228,7 +252,7 @@ def graph_boolean(q):
 		if int(e.text) in choices:
 			choices[int(e.text)] += 1
 	
-	# only two choices unless we accept maybies
+	# only two choices (unless we accept maybies)
 	long_answers = ["Nay", "Yea"]
 
 	for size in GRAPH_SIZES:
@@ -238,11 +262,11 @@ def graph_boolean(q):
 		pie.add_data(choices.values())
 		pie.set_legend(long_answers)
 		pie.set_colours(['0091C7','0FBBD0'])
-		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		pie.download(filename)
 		print 'saved ' + filename
 	
-	return 'graphed boolean'
+	return 'graphed entries ' + question.text
 
 
 def graph_free_text(q):

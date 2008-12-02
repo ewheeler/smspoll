@@ -15,7 +15,7 @@
 	<div id="answers">
 		<h2>Answers</h2>{% if question %}{% if entries %}
 		<ul>{% for entry in entries %}
-			<li>
+			<li{% if not entry.moderated %} class="unmoderated"{% endif %} id="ent-{{ entry.pk }}">
 				<span>{{ entry.meta_data }}</span>
 				<p>{{ entry.text }}</p>
 			</li>{% endfor %}
@@ -26,6 +26,48 @@
 		<div class="no-entries">
 			No question is currently active.
 		</div>{% endif %}
+		<script type="text/javascript">
+			window.addEvent("domready", function() {
+				var moderate = function() {
+					var parent = this.getParent();
+					var pk = parent.id.replace(/\D/g, "");
+					var status = this.hasClass("mod-win") ? "win" : "fail";
+					
+					/* submit the moderation via ajax */
+					new Request({
+						"url": ("/moderate/" + pk + "/" + status),
+						"onSuccess": function() {
+							
+							/* accept the entry by removing the
+							 * WARNING highlight and mod buttons */
+							if (status=="win") {
+								parent.removeClass("unmoderated");
+								parent.getElements("div").dispose();
+							
+							/* failed moderation, so remove
+							 * the element from view */
+							} else parent.dispose();
+						}
+					}).send();
+				};
+				
+				$$("#answers li.unmoderated").each(function(el) {
+					var meta = el.getFirst();
+					
+					new Element("div", {
+						"class": "mod-fail",
+						"title": "Reject this answer",
+						"events": { "click": moderate }
+					}).inject(meta, "after");
+					
+					new Element("div", {
+						"class": "mod-win",
+						"title": "Accept this answer",
+						"events": { "click": moderate }
+					}).inject(meta, "after");
+				});
+			});
+		</script>
 	</div>
 	
 	<div id="previous">

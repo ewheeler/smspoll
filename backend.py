@@ -89,8 +89,8 @@ class App(SmsApplication):
 			is_outgoing=False,
 			phone=caller,
 			text=msg)
-		
 
+	
 	# as above...
 	def before_outgoing(self, caller, msg):
 		

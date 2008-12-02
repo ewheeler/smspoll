@@ -62,6 +62,7 @@ class Question(models.Model):
 	end = models.DateField()
 	text = models.CharField(max_length=160)
 	type = models.CharField(max_length=1, choices=QUESTION_TYPES)
+	sent_to = models.IntegerField(blank=True, null=True)
 
 	def __unicode__(self):
 		return self.text
