@@ -21,7 +21,6 @@ def golden(width):
 	return int(width/1.6180339887498948482)
 
 
-
 def dashboard(req, id=None):
 
 	# if a pk was passed in the url, then
@@ -154,14 +153,16 @@ def graph_participation(q):
 	# grab ALL entries for this question
 	entries = Entry.objects.filter(question=question)
 
-	# grab active respondants
-	# TODO this will be inaccurate for older questions
-	# and should find only respondants that were active
-	# for this question
-	all_respondants = Respondant.objects.filter(is_active=True)
+	# look up how many people were asked this question
+	# and make a ratio
+	# if None, use 0
+	if question.sent_to:
+		participation = float(len(entries))/float(question.sent_to)
+	else: 
+		participation = 0.0
 
 	# normalize data
-	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
+	pending = 100 * (1.0 - participation)
 	participants = 100 - pending 
 
 	for size in GRAPH_SIZES:
@@ -216,7 +217,7 @@ def graph_multiple_choice(q):
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
 		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
-		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		bar.download(filename)
 		print 'saved ' + filename
 	
@@ -260,7 +261,7 @@ def graph_boolean(q):
 		pie.add_data(choices.values())
 		pie.set_legend(long_answers)
 		pie.set_colours(['0091C7','0FBBD0'])
-		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		pie.download(filename)
 		print 'saved ' + filename
 	
