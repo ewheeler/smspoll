@@ -48,6 +48,8 @@ class Message(models.Model):
 	text = models.CharField(max_length=160)
 	is_outgoing = models.BooleanField()
 
+	def __unicode__(self):
+		return self.text
 
 class Question(models.Model):
 	QUESTION_TYPES = (
