@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, '..'))
 
 GRAPH_DIR = 'poll/graphs/'
-SIZES = ['500', '240']
+GRAPH_SIZES = ['500', '240']
 
 
 def golden(width):
@@ -105,7 +105,6 @@ def graph_entries(q):
 
 	# figure out what kind of question we have
 	# and generate the appropriate graph
-	print question.type
 	if question.type == 'M':
 		return graph_multiple_choice(question)
 	if question.type == 'B':
@@ -130,7 +129,7 @@ def graph_participation(q):
 	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
 	participants = 100 - pending 
 
-	for size in SIZES:
+	for size in GRAPH_SIZES:
 		# configure and save the graph
 		pie = PieChart2D(int(size), golden(int(size)))
 		pie.add_data([pending, participants])
@@ -174,13 +173,12 @@ def graph_multiple_choice(q):
 	for a in answers:
 		long_answers.append(a.text)
 
-	for size in SIZES:
+	for size in GRAPH_SIZES:
 		# configure and save the graph
 		bar = StackedVerticalBarChart(int(size), golden(int(size)))
 		bar.set_colours(['0091C7','0FBBD0'])
 		bar.add_data(choices.values())
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
-		#bar.set_bar_width(50)
 		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
 		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
@@ -220,7 +218,7 @@ def graph_boolean(q):
 	# only two choices unless we accept maybies
 	long_answers = ["Nay", "Yea"]
 
-	for size in SIZES:
+	for size in GRAPH_SIZES:
 		# configure and save the graph
 		pie = PieChart2D(int(size), golden(int(size)))
 		# TODO normalize values
