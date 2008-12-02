@@ -179,8 +179,8 @@ form { }
 	
 	.q-summ img {
 		display: block;
-		width: 240px;
-		height: 100px;
+		/*width: 240px;
+		height: 100px;*/
 		background: #fff;
 		margin-bottom: 0.25em;
 		border: 0;
