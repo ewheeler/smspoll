@@ -13,8 +13,12 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, '..'))
 
 GRAPH_DIR = 'poll/graphs/'
-CURRENT_WIDTH = 500 
 SIZES = ['500', '240']
+
+
+def golden(width):
+	return int(width/1.6180339887498948482)
+
 
 def dashboard(req, id=None):
 
@@ -126,14 +130,16 @@ def graph_participation(q):
 	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
 	participants = 100 - pending 
 
-	# configure and save the graph
-	pie = PieChart2D(300, 100)
-	pie.add_data([pending, participants])
-	pie.set_legend(['Pending' , 'Respondants'])
-	pie.set_colours(['0091C7','0FBBD0'])
-	filename = GRAPH_DIR + str(question.pk) + '-participation.png'
-	pie.download(filename)
-	
+	for size in SIZES:
+		# configure and save the graph
+		pie = PieChart2D(int(size), golden(int(size)))
+		pie.add_data([pending, participants])
+		pie.set_legend(['Pending' , 'Respondants'])
+		pie.set_colours(['0091C7','0FBBD0'])
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-participation.png'
+		pie.download(filename)
+		print 'saved ' + filename
+
 	return 'saved ' + filename	
 
 
@@ -182,9 +188,6 @@ def graph_multiple_choice(q):
 		print 'saved ' + filename
 	
 	return 'saved ' + filename	
-
-def golden(width):
-	return int(width/1.6180339887498948482)
 
 
 def graph_boolean(q):
