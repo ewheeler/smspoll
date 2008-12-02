@@ -3,8 +3,19 @@
 
 import kannel
 from smsapp import *
-
 from poll.models import *
+
+
+def broadcaster():
+	if Question.current():
+		# do nothing if current question has already been sent
+		if Question.current().sent_to: return None
+
+		# otherwise broadcast current question
+		else: return broadcast_question(Question.current())
+
+	return None
+
 
 def broadcast_question(question):
 	# lets send with pykannel!
