@@ -140,7 +140,7 @@ form { }
 		display: block;
 		background: #eee;
 		margin: 0.5em 0;
-		width: 100%;
+		/*width: 100%;*/
 	}
 	
 	.q-full h3,
@@ -273,7 +273,7 @@ form { }
 		 */
 		 
 		.dashboard #current img {
-			height: 24.58em;
+			/*height: 24.58em;*/
 		}
 		
 		.dashboard .no-current {
