@@ -7,6 +7,8 @@ from poll.models import *
 
 
 def broadcaster():
+	# if the current question has not been sent,
+	# broadcaster will broadcast it
 	if Question.current():
 		# do nothing if current question has already been sent
 		if Question.current().sent_to: return None
@@ -18,7 +20,7 @@ def broadcaster():
 
 
 def broadcast_question(question):
-	# lets send with pykannel!
+	# lets send SMSs with pykannel!
 	sender = kannel.SmsSender("user", "password")
 
 	# gather active respondants

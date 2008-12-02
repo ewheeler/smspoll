@@ -6,13 +6,18 @@ from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarC
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.db import IntegrityError
+
 from models import *
 from utils import *
 
+# craziness to get the graphs to save in the right spot
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, '..'))
 
+# path, from above craziness, to graphs directory
 GRAPH_DIR = 'poll/graphs/'
+
+# graph sizes to generate (big & thumb)
 GRAPH_SIZES = ['500', '240']
 
 
@@ -112,9 +117,6 @@ def graph_entries(q):
 	# generate question participation graph
 	print graph_participation(q)
 
-	# collect answers to this question
-	answers = Answer.objects.filter(question=question)
-
 	# figure out what kind of question we have
 	# and generate the appropriate graph
 	if question.type == 'M':
@@ -153,7 +155,7 @@ def graph_participation(q):
 		pie.download(filename)
 		print 'saved ' + filename
 
-	return 'graphed participation'
+	return 'graphed participation ' + question.text
 
 
 def graph_multiple_choice(q):
@@ -162,9 +164,8 @@ def graph_multiple_choice(q):
 	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
 
-	# this is obnoxious but the best
-	# way python will allow making a
-	# dict from a list
+	# this is obnoxious but the easiest
+	# way to make a dict from a list
 	choices = { " " : 0 }
 	choices = choices.fromkeys(xrange(len(answers)), 0)
 
@@ -199,7 +200,7 @@ def graph_multiple_choice(q):
 		bar.download(filename)
 		print 'saved ' + filename
 	
-	return 'graphed multiple choice'
+	return 'graphed entries ' + question.text
 
 
 def graph_boolean(q):
@@ -229,7 +230,7 @@ def graph_boolean(q):
 		if int(e.text) in choices:
 			choices[int(e.text)] += 1
 	
-	# only two choices unless we accept maybies
+	# only two choices (unless we accept maybies)
 	long_answers = ["Nay", "Yea"]
 
 	for size in GRAPH_SIZES:
@@ -243,7 +244,7 @@ def graph_boolean(q):
 		pie.download(filename)
 		print 'saved ' + filename
 	
-	return 'graphed boolean'
+	return 'graphed entries ' + question.text
 
 
 def graph_free_text(q):
