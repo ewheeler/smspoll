@@ -20,7 +20,6 @@ def golden(width):
 	return int(width/1.6180339887498948482)
 
 
-
 def dashboard(req, id=None):
 
 	# if a pk was passed in the url, then
@@ -132,14 +131,8 @@ def graph_participation(q):
 	# grab ALL entries for this question
 	entries = Entry.objects.filter(question=question)
 
-	# grab active respondants
-	# TODO this will be inaccurate for older questions
-	# and should find only respondants that were active
-	# for this question
-	all_respondants = Respondant.objects.filter(is_active=True)
-
 	# normalize data
-	pending = 100 * (1.0 - (float(len(entries))/float(len(all_respondants))))
+	pending = 100 * (1.0 - (float(len(entries))/float(question.sent_to)))
 	participants = 100 - pending 
 
 	for size in GRAPH_SIZES:
