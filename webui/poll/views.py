@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 
 GRAPH_DIR = 'poll/graphs/'
 CURRENT_WIDTH = 500 
+SIZES = ['500', '240']
 
 def dashboard(req, id=None):
 
@@ -167,16 +168,18 @@ def graph_multiple_choice(q):
 	for a in answers:
 		long_answers.append(a.text)
 
-	# configure and save the graph
-	bar = StackedVerticalBarChart(CURRENT_WIDTH, golden(CURRENT_WIDTH))
-	bar.set_colours(['0091C7','0FBBD0'])
-	bar.add_data(choices.values())
-	bar.set_bar_width(int(CURRENT_WIDTH/(len(choices)+1)))
-	#bar.set_bar_width(50)
-	index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
-	bar.set_axis_style(index, '202020', font_size=9, alignment=0)
-	filename = GRAPH_DIR + str(question.pk) + '-graph.png'
-	bar.download(filename)
+	for size in SIZES:
+		# configure and save the graph
+		bar = StackedVerticalBarChart(int(size), golden(int(size)))
+		bar.set_colours(['0091C7','0FBBD0'])
+		bar.add_data(choices.values())
+		bar.set_bar_width(int(int(size)/(len(choices)+1)))
+		#bar.set_bar_width(50)
+		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
+		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		bar.download(filename)
+		print 'saved ' + filename
 	
 	return 'saved ' + filename	
 
@@ -214,14 +217,16 @@ def graph_boolean(q):
 	# only two choices unless we accept maybies
 	long_answers = ["Nay", "Yea"]
 
-	# configure and save the graph
-	pie = PieChart2D(CURRENT_WIDTH, golden(CURRENT_WIDTH))
-	# TODO normalize values
-	pie.add_data(choices.values())
-	pie.set_legend(long_answers)
-	pie.set_colours(['0091C7','0FBBD0'])
-	filename = GRAPH_DIR + str(question.pk) + '-graph.png'
-	pie.download(filename)
+	for size in SIZES:
+		# configure and save the graph
+		pie = PieChart2D(int(size), golden(int(size)))
+		# TODO normalize values
+		pie.add_data(choices.values())
+		pie.set_legend(long_answers)
+		pie.set_colours(['0091C7','0FBBD0'])
+		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-graph.png'
+		pie.download(filename)
+		print 'saved ' + filename
 	
 	return 'saved ' + filename	
 
