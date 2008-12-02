@@ -3,8 +3,9 @@
 import os, sys
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
+from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.db import IntegrityError
 from models import *
 from utils import *
@@ -82,6 +83,27 @@ def add_question(req):
 	return render_to_response("add-question.html", {
 		"tab": "add-question"
 	})
+
+
+@require_POST
+def moderate(req, id, status):
+	ent = get_object_or_404(Entry, pk=id)
+	
+	# update the "moderated" status,
+	# which makes this a regular entry
+	if (status == "win"):
+		ent.moderated = True
+		ent.save()
+	
+	# remove bad entries from the db
+	# altogether. we'll still have the
+	# Message object to refer to
+	elif (status == "fail"):
+		ent.delete()
+	
+	# a really boring response. the HTTP code
+	# is all we really need on the client side
+	return HttpResponse("OK", content_type="text/plain")
 
 
 def add_answer(req):
