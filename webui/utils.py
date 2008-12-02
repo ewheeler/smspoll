@@ -39,7 +39,6 @@ def broadcast_question(question):
 
 
 def querydict_to_dict(qd):
-	if isinstance(qd, dict): return qd
 	return dict((str(k), v) for k, v in qd.iteritems())
 
 
@@ -47,19 +46,27 @@ def querydict_to_dict(qd):
 
 from django.db.models.fields import DateField
 
-def object_from_querydict(model, qd, suffix=""):
+def object_from_querydict(model, qd, other=None, suffix=""):
 	dict = querydict_to_dict(qd)
 	obj_dict = {}
+	
+	# if applicable, merge the 'other' dict,
+	# which contains pre-filled values, not
+	# from a query dict
+	if other is not None:
+		for k, v in other.iteritems():
+			dict[str(k) + suffix] = v
 	
 	# iterate the fields in the model, building
 	# a dict of matching POSTed values as we go
 	for field in model._meta.fields:
-		fn = field.name + suffix
+		fn = field.name
+		fns = fn + suffix
 		
 		# if an exact match was
 		# POSTed, then use that
-		if fn in dict:
-			obj_dict[fn] = dict[fn]
+		if fns in dict:
+			obj_dict[fn] = dict[fns]
 		
 		# date fields can be provided as three
 		# separate values, so D/M/Y <select>
@@ -67,9 +74,9 @@ def object_from_querydict(model, qd, suffix=""):
 		elif isinstance(field, DateField):
 			try:
 				obj_dict[fn] = "%4d-%02d-%02d" % (
-					int(dict[fn+"-year"]),
-					int(dict[fn+"-month"]),
-					int(dict[fn+"-day"]))
+					int(dict[fns+"-year"]),
+					int(dict[fns+"-month"]),
+					int(dict[fns+"-day"]))
 			
 			# choo choooo...
 			# all aboard the fail train

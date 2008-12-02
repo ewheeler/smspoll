@@ -115,12 +115,17 @@
 					}).inject(frm.getElement(".submit"), "top");
 				};
 				
+				/* submit the form via ajax, and create a notification
+				 * div. if an object was successfully created, redirect
+				 * back to the dashboard */
 				new Request({
 					"url": (frm.action || location.href),
+					
 					"onSuccess": function() {
 						status_div("success", "Question added");
 						location = "/";
 					},
+					
 					"onFailure": function(xhr) {
 						status_div("errors", xhr.responseText);
 					}
