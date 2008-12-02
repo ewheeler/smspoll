@@ -311,6 +311,33 @@ form { }
 			margin-top: 0.5em;
 		}
 		
+			/* unmoderated answers are bright red */
+			.dashboard #answers li.unmoderated {
+				background: #fee;
+				color: #a00;
+			}
+			
+				.dashboard #answers li.unmoderated span {
+					background: #fcc;
+					color: #f88;
+				}
+				
+				/* these moderation buttons are added by
+				 * javascript (since they only WORK when
+				 * js is available) */
+				.dashboard #answers .mod-win,
+				.dashboard #answers .mod-fail {
+					background-repeat: no-repeat;
+					margin: 0.25em 0.25em 0 0;
+					float: right;
+					width: 16px;
+					height: 16px;
+					cursor: pointer;
+				}
+				
+				.dashboard #answers .mod-win  { background-image: url("/assets/ok.png"); }
+				.dashboard #answers .mod-fail { background-image: url("/assets/cancel.png"); }
+		
 			.dashboard #answers li span {
 				display: block;
 				font-size: 80%;
