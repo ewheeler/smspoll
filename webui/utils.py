@@ -1,19 +1,42 @@
 #!/usr/bin/env python
 # vim: noet
 
-#import kannel
-#from smsapp import *
+import kannel
+from smsapp import *
 
+from poll.models import *
 
-def blast_numbers(numbers, message):
-	# blasts a message to a list of numbers
-	sending = 0
+def broadcast_question(question):
+	# lets send with pykannel!
 	sender = kannel.SmsSender("user", "password")
-	for n in numbers:
-		sender.send(n, message)
+
+	# gather active respondants
+	respondants = Respondant.objects.filter(is_active=True)
+	sending = 0
+
+	# message to be blasted
+	broadcast = question.text
+
+	# unless this is a free text question,
+	# add the answer choices to the broadcast message
+	if question.type != 'F':
+		answers = Answer.objects.filter(question=question.pk)
+		for a in answers:
+			broadcast = broadcast + '\n ' + a.choice + ' - ' + a.text
+
+	# blast the broadcast message to our active respondants
+	# and increment the counter
+	for r in respondants:
+		sender.send(r.phone, broadcast)
 		sending += 1
-		print 'Blasted to %d of %d numbers...' % (sending, len(numbers))
-        return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
+		print 'Blasted to %d of %d numbers...' % (sending, len(respondants))
+
+	# save number broadcasted to db
+	question.sent_to = sending
+	question.save()
+
+	return 'Blasted %s to %d numbers with %d failures' % (broadcast, sending, (len(respondants) - sending))
+
 
 def querydict_to_dict(qd):
 	if isinstance(qd, dict): return qd
