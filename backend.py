@@ -156,9 +156,15 @@ class App(SmsApplication):
 				respondant=r,
 				question=ques,
 				message=self.log_msg,
-				is_unparseable=True,
-				moderated=True,
-				text=msg)
+				text=msg,
+				
+				# if the message was parsed, then we can assume
+				# that is is safe to display publicly (moderated).
+				# otherwise, keep it UNMODERATED, because we have
+				# no idea what it might contain
+				is_unparseable=unparseable,
+				moderated=(not unparseable))
+			
 			self.respond(response)
 
 
@@ -174,9 +180,6 @@ class App(SmsApplication):
 			is_outgoing=False,
 			phone=caller,
 			text=msg)
-		
-		
-	
 	
 	# as above...
 	def before_outgoing(self, caller, msg):
