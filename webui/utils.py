@@ -228,10 +228,13 @@ def parse_message(msg_or_entry, question):
 	# can either update our existing Entry or make
 	# a new one...
 	if correction:
+	
 		# update the entry
 		entry.text = text
 		entry.is_unparseable = unparseable
+		entry.moderated = moderated
 		entry.save()
+		
 	else:
 		# make a new entry
 		Entry.objects.create(
@@ -240,8 +243,7 @@ def parse_message(msg_or_entry, question):
 			message=message,
 			is_unparseable=unparseable,
 			moderated=moderated,
-			text=text
-		)
+			text=text)
 
 	# now return the result of the parse
 	if unparseable: return False
