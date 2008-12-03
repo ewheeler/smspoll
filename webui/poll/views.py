@@ -44,7 +44,7 @@ def dashboard(req, id=None):
 	# entries are stored in the Entry object (which
 	# is kind of a hack), so we filter those out until
 	# they're fixed on the "unparseables" page
-	if ques: entries = ques.entry_set.filter()#is_unparseable=False)
+	if ques: entries = ques.entry_set.filter(is_unparseable=False)
 	else: entries = []
 	
 	return render_to_response("dashboard.html", {
