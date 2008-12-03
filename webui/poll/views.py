@@ -152,7 +152,8 @@ def add_answer(req):
 
 def message_log(req):
 	return render_to_response("message-log.html", {
-		"messages": Message.objects.all().order_by("-pk")
+		"messages": Message.objects.all().order_by("-pk"),
+		"tab": "log"
 	})
 
 
