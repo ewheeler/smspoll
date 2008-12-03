@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+{% load utils %}
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
 		<title>SMS Poll :: {% block title %}{% endblock %}</title>
@@ -16,6 +16,7 @@
 				<li{% ifequal tab "add-question" %} class="active"{% endifequal %}><a href="/add">Add a Question</a></li>
 				<!--<li><a href="/add-answer">Add an Answer</a></li>-->
 				<li{% ifequal tab "log" %} class="active"{% endifequal %}><a href="/log">Message Log</a></li>
+				<li{% ifequal tab "unparseables" %} class="active"{% endifequal %}><a href="/unparseables">Unparseables {% num_unparseables %}</a></li>
 			</ul>
 		</div>
 		<div id="inner">
