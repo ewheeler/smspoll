@@ -47,7 +47,7 @@ def dashboard(req, id=None):
 	# they're fixed on the "unparseables" page
 	if ques: entries = ques.entry_set.filter(is_unparseable=False)
 	else: entries = []
-	
+
 	return render_to_response("dashboard.html", {
 		"question": ques,
 		"previous": prev,
@@ -164,12 +164,12 @@ def moderate(req, id, status):
 
 
 @require_POST
-def correction(req, id, text):
-	
+def correction(req, id):
+
 	# update the Entry and Message objects
 	ent = get_object_or_404(Entry, pk=id)
-	ent.message.text = text
-	ent.save
+	ent.message.text = req.POST["text"]
+	ent.save()
 	
 	# run the correction back through the parser,
 	# and throw an http500 (mostly to be caught
@@ -204,6 +204,13 @@ def message_log(req):
 	return render_to_response("message-log.html", {
 		"messages": Message.objects.all().order_by("-pk"),
 		"tab": "log"
+	})
+
+
+def unparseables(req):
+	return render_to_response("unparseables.html", {
+		"questions": Question.have_unparseables(),
+		"tab": "unparseables"
 	})
 
 
