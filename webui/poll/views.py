@@ -267,11 +267,13 @@ def graph_multiple_choice(q):
 	# collect answers to this question
 	answers = Answer.objects.filter(question=question)
 
-	# this is obnoxious but the easiest
-	# way to make a dict from a list
-	choices = { " " : 0 }
-	choices = choices.fromkeys(xrange(len(answers)), 0)
+	# old code for handling any number of choices
+	# choices = { " " : 0 }
+	# choices = choices.fromkeys(xrange(len(answers)), 0)
 
+	# hardcode of four choices since ui limits to four
+	choices = { 1 : 0, 2 : 0, 3 : 0, 4 : 0 }
+	
 	# grab the parsed entries for this question
 	entries = Entry.objects.filter(question=question,\
 					is_unparseable=False)
