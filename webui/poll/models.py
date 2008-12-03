@@ -67,6 +67,24 @@ class Question(models.Model):
 	def __unicode__(self):
 		return self.text
 
+
+	def unparseables(self):
+		'''returns the unparseables entries associated with
+		this question in a QuerySet (empty if none exist)'''
+		
+		return Entry.objects.filter(question=self.id, is_unparseable=True)
+
+	@staticmethod
+	def have_unparseables():
+		'''returns a list of questions that have
+		unparseable entries associated with them'''
+
+		questions = []
+		for q in Question.objects.all():
+			if q.unparseables(): questions.append(q)
+
+		return questions
+
 	@staticmethod
 	def current():
 		# delegate to the 'on' method, to find
