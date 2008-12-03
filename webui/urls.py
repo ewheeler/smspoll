@@ -27,6 +27,7 @@ urlpatterns = patterns('',
 	# ajax
 	(r'^moderate/(?P<id>\d+)/(?P<status>win|fail)$', pv.moderate),
 	(r'^correct/(?P<id>\d+)$', pv.correction),
+	(r'^unparseables$', pv.unparseables),
 
     # enable the django magic admin
     (r'^admin/(.*)', admin.site.root),
