@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}Unparseables{% endblock %}
+{% block content %}
+		
+		<script type="text/javascript">
+			window.addEvent("domready", function() {
+				var correct = function() {
+					var parent = this.getParent("tr");
+					var pk = parent.id.replace(/\D/g, "");
+					
+					/* submit the correction via ajax */
+					new Request({
+						"url": ("/correct/" + pk),
+						"onSuccess": function() {
+							//alert("win");
+							parent.dispose();
+						},
+						"onFailure": function() {
+							//alert("fail");
+						},
+						"data": {"text": this.value}
+					}).send();
+				};
+				
+				$$("#unparseables tbody tr").each(function(el) {
+					var meta = el.getFirst();
+					el.getElements("input").addEvent("click", correct);				
+				});
+			});
+		</script>
+
+{% for q in questions %}
+	<h2>{{ q.text }}</h2>
+	<table id="unparseables">
+		<thead>
+			<tr>
+				<th>Text</th>
+				<th>Correction</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for u in q.unparseables %}
+			<tr id="u-{{ u.id }}">
+				<td>{{ u.text }}</td>
+				<td>
+				{% ifequal q.type "B" %}
+					<input type="button" value="Yes" />
+					<input type="button" value="No" />
+				{% endifequal%}
+				{% ifequal q.type "M" %}
+					{% for a in q.answer_set.all %}
+					{% endfor %}
+				{% endifequal %}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endfor %}
+
+{% if not questions %}
+	<p>There are currently no unparseable entries.</p>
+{% endif %}
+
+{% endblock %}
