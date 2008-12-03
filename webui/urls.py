@@ -20,10 +20,13 @@ urlpatterns = patterns('',
 	# poll views (move to poll/urls.py)
 	(r'^$', pv.dashboard),
 	(r'^question/(?P<id>\d+)$', pv.dashboard),
-	(r'^moderate/(?P<id>\d+)/(?P<status>win|fail)$', pv.moderate),
 	(r'^add$', pv.add_question),
 	(r'^add-answer$', pv.add_answer),
 	(r'^log$', pv.message_log),
+	
+	# ajax
+	(r'^moderate/(?P<id>\d+)/(?P<status>win|fail)$', pv.moderate),
+	(r'^correct/(?P<id>\d+)$', pv.correct),
 
     # enable the django magic admin
     (r'^admin/(.*)', admin.site.root),

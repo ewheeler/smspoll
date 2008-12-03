@@ -40,8 +40,11 @@ def dashboard(req, id=None):
 	
 	# show all of the answers related to this
 	# question. these have already been filtered
-	# by the backend, but not moderated
-	if ques: entries = ques.entry_set.all()
+	# by the backend, but not moderated. unparseable
+	# entries are stored in the Entry object (which
+	# is kind of a hack), so we filter those out until
+	# they're fixed on the "unparseables" page
+	if ques: entries = ques.entry_set.filter()#is_unparseable=False)
 	else: entries = []
 	
 	return render_to_response("dashboard.html", {
@@ -107,6 +110,26 @@ def moderate(req, id, status):
 	
 	# a really boring response. the HTTP code
 	# is all we really need on the client side
+	return HttpResponse("OK", content_type="text/plain")
+
+
+@require_POST
+def correction(req, id, text):
+	
+	# update the Entry and Message objects
+	ent = get_object_or_404(Entry, pk=id)
+	ent.message.text = text
+	ent.save
+	
+	# run the correction back through the parser,
+	# and throw an http500 (mostly to be caught
+	# by ajax) if it failed again
+	if not parse_message(ent, ent.question):
+		return HttpResponseServerError(
+			"Entry was still unparseable",
+			content_type="text/plain")
+	
+	# no fail = success!
 	return HttpResponse("OK", content_type="text/plain")
 
 
