@@ -24,7 +24,7 @@
 				
 				$$("#unparseables tbody tr").each(function(el) {
 					var meta = el.getFirst();
-					el.getElements("input").addEvent("click", correct);				
+					el.getElements("button").addEvent("click", correct);				
 				});
 			});
 		</script>
@@ -44,11 +44,12 @@
 				<td>{{ u.text }}</td>
 				<td>
 				{% ifequal q.type "B" %}
-					<input type="button" value="Yes" />
-					<input type="button" value="No" />
+					<button value="yes">Yes</button>
+					<button value="no">No</button>
 				{% endifequal%}
 				{% ifequal q.type "M" %}
 					{% for a in q.answer_set.all %}
+					<button value="{{ a.choice }}">({{ a.choice }}) {{ a.text }}</button>
 					{% endfor %}
 				{% endifequal %}
 				</td>
