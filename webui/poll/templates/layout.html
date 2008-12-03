@@ -15,7 +15,7 @@
 				<li{% ifequal tab "dashboard" %} class="active"{% endifequal %}><a href="/">Dashboard</a></li>
 				<li{% ifequal tab "add-question" %} class="active"{% endifequal %}><a href="/add">Add a Question</a></li>
 				<!--<li><a href="/add-answer">Add an Answer</a></li>-->
-				<li><a href="/log">Message Log</a></li>
+				<li{% ifequal tab "log" %} class="active"{% endifequal %}><a href="/log">Message Log</a></li>
 			</ul>
 		</div>
 		<div id="inner">
