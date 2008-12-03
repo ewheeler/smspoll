@@ -265,7 +265,7 @@ def graph_multiple_choice(q):
 	question = get_object_or_404(Question, pk=q.pk)
 	
 	# collect answers to this question
-	answers = Answer.objects.filter(question=question)
+	answers = Answer.objects.filter(question=question).order_by('choice')
 
 	# old code for handling any number of choices
 	# choices = { " " : 0 }
