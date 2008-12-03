@@ -69,15 +69,20 @@ class Question(models.Model):
 
 	@staticmethod
 	def current():
-		today = date.today()
+		# delegate to the 'on' method, to find
+		# the (single!) question active today
+		return Question.on(date.today())
 		
-		# fetch all of the questions with dates spanning today. the
+	@staticmethod
+	def on(day):
+		
+		# fetch all of the questions with dates spanning 'date'. the
 		# app should prevent there being more than one question active
 		# on a single day, but since django 1.0 doesn't have model
 		# validation, it's entirely possible
 		active = Question.objects.filter(
-			start__lte=today,
-			end__gte=today
+			start__lte=day,
+			end__gte=day
 		).order_by('-end')
 		
 		# it's okay if nothing is active today

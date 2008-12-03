@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim: noet
 import os, sys
+from datetime import datetime, date, timedelta
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
 from django.views.decorators.http import require_POST
@@ -60,7 +61,19 @@ def add_question(req):
 	# if we are POSTing, create the object
 	# (and children) before redirecting
 	if req.method == "POST":
+		p = req.POST
 		try:
+			# extract the date range from the query dict
+			start_str = "%4d-%02d-%02d" % (int(p["start-year"]), int(p["start-month"]), int(p["start-day"]))
+			end_str   = "%4d-%02d-%02d" % (int(p["end-year"]), int(p["end-month"]), int(p["end-day"]))
+			
+			# before saving, check that the dates are
+			# available (although this should have already been
+			# done on the client side by ajax, we must check)
+			avail = is_available(None, start_str, end_str)
+			if isinstance(avail, HttpResponseServerError):
+				return avail
+			
 			q = object_from_querydict(Question, req.POST)
 			q.save()
 			
@@ -90,6 +103,43 @@ def add_question(req):
 	return render_to_response("add-question.html", {
 		"tab": "add-question"
 	})
+
+
+def is_available(req, from_str, to_str):
+	delta = timedelta(1)
+	fmt = "%Y-%m-%d"
+
+	# parse into date objects
+	day = datetime.strptime(from_str, fmt)
+	last = datetime.strptime(to_str, fmt)
+	
+	taken = []
+	while(day <= last):
+		q = Question.on(day)
+		if q is not None:
+			taken.append((q, day))
+		
+		# next day
+		day += delta
+	
+	# if any of the days we just iterated were
+	# already taken by an existing question,
+	# then compile and return a list of errors
+	# to be displayed by ajax (or seen by a low-
+	# tech or non-js browser)
+	if len(taken):
+		errs = ["  %s by %s" % (day.strftime(fmt), q) for q, day in taken]
+		return HttpResponseServerError(
+			"The following dates are already reserved:\n" + "\n".join(errs),
+			content_type="text/plain")
+	
+	# no dates were taken, so this range is fine
+	return HttpResponse("OK", content_type="text/plain")
+		
+
+	
+	
+
 
 
 @require_POST

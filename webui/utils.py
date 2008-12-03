@@ -100,6 +100,9 @@ def object_from_querydict(model, qd, other=None, suffix=""):
 	# the fields we just extracted
 	return model(**obj_dict)
 
+def extract_date(qd, prefix):
+	pass
+
 
 def parse_message(msg_or_entry, question):
 	'''This function takes an incoming message and
