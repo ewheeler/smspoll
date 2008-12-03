@@ -6,6 +6,7 @@ register = Library()
 from django.utils.dates import MONTHS
 import time
 
+# INCLUSION TAGS --------------------------------------------
 
 @register.inclusion_tag("partials/date-selector.html")
 def date_selector(prefix):
@@ -33,3 +34,11 @@ def question_full(question):
 def add_answer(number):
 	return { "questions" : Question.objects.all(),\
 				"number" : number }
+
+# SIMPLE TAGS -----------------------------------------------
+
+@register.simple_tag
+def num_unparseables():
+	num = len(Entry.objects.filter(is_unparseable=True))
+	if num > 0: return "(%d)" % num
+	else:       return ""
