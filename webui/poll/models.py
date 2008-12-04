@@ -74,6 +74,10 @@ class Question(models.Model):
 		
 		return Entry.objects.filter(question=self.id, is_unparseable=True)
 
+	def is_current(self):
+		'''returns True if this is the current question'''
+		return (self == Question.current())
+
 	@staticmethod
 	def have_unparseables():
 		'''returns a list of questions that have
@@ -134,10 +138,10 @@ class Entry(models.Model):
 		return self.text
 	
 	def meta_data(self):
-		return "%s on %s at %s" % (
+		return "%s - %s %s" % (
 			self.respondant.phone,
-			self.time.strftime("%d/%m"),
-			self.time.strftime("%H:%M"))
+			self.time.strftime("%a %b %e"),
+			self.time.strftime("%I:%M %p"))
 	
 	def display_text(self):
 		# assume that the display text is just the text,
