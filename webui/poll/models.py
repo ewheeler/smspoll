@@ -139,5 +139,24 @@ class Entry(models.Model):
 			self.time.strftime("%d/%m"),
 			self.time.strftime("%H:%M"))
 	
+	def display_text(self):
+		# assume that the display text is just the text,
+		# since this is what it is for free text entries
+		display_text = self.text
+		# switch the text for boolean/multiple choice entries
+		if self.question.type == "B":
+			# TODO proper i18n for this!
+			if self.text == "0":   display_text = "No"
+			elif self.text == "1": display_text = "Yes"
+		elif self.question.type == "M":
+			# get the full answer text
+			try:
+				display_text = Answer.objects.get(
+						question=self.question, 
+						choice=self.text).text
+			except: pass # TODO something here...
+
+		return display_text
+
 	class Meta:
 		verbose_name_plural="Entries"

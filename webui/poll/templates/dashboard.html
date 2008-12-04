@@ -17,7 +17,7 @@
 		<ul>{% for entry in entries %}
 			<li{% if not entry.moderated %} class="unmoderated"{% endif %} id="ent-{{ entry.pk }}">
 				<span>{{ entry.meta_data }}</span>
-				<p>{{ entry.text }}</p>
+				<p>{{ entry.display_text }}</p>
 			</li>{% endfor %}
 		</ul>{% else %}
 		<div class="no-entries">
