@@ -99,18 +99,21 @@ def graph_multiple_choice(q):
 		if int(e.text) in choices:
 			choices[int(e.text)] += 1
 
+	choice_counts = sortedDictValues1(choices)
+
 	# collect the long, textual representation
 	# of the answer choice for labelling the graph
 	long_answers = []
 	for a in answers:
 		long_answers.append(a.text)
 
-
+	
 	for size in GRAPH_SIZES:
 		# configure and save the graph
-		bar = StackedVerticalBarChart(int(size), golden(int(size)))
+		bar = StackedVerticalBarChart(int(size), golden(int(size)),\
+					y_range=(0, max(choice_counts)))
 		bar.set_colours(['0091C7','0FBBD0'])
-		bar.add_data(sortedDictValues1(choices))
+		bar.add_data(choice_counts)
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
 		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
