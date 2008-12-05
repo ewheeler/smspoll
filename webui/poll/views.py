@@ -23,11 +23,8 @@ def dashboard(req, id=None):
 	
 	# show all of the answers related to this
 	# question. these have already been filtered
-	# by the backend, but not moderated. unparseable
-	# entries are stored in the Entry object (which
-	# is kind of a hack), so we filter those out until
-	# they're fixed on the "unparseables" page
-	if ques: entries = ques.entry_set.filter(is_unparseable=False)
+	# by the backend, but not moderated or parsed
+	if ques: entries = ques.entry_set.all()
 	else: entries = []
 
 	return render_to_response("dashboard.html", {
@@ -110,18 +107,13 @@ def is_available(req, from_str, to_str):
 	# to be displayed by ajax (or seen by a low-
 	# tech or non-js browser)
 	if len(taken):
-		errs = ["  %s by %s" % (day.strftime(fmt), q) for q, day in taken]
+		errs = ["<li>%s by %s</li>" % (day.strftime(fmt), q) for q, day in taken]
 		return HttpResponseServerError(
-			"The following dates are already reserved:\n" + "\n".join(errs),
+			"The following dates are already reserved:\n<ul>\n" + "\n".join(errs) + "\n</ul>",
 			content_type="text/plain")
 	
 	# no dates were taken, so this range is fine
 	return HttpResponse("OK", content_type="text/plain")
-		
-
-	
-	
-
 
 
 @require_POST
@@ -150,48 +142,32 @@ def correction(req, id):
 
 	# update the Entry and Message objects
 	ent = get_object_or_404(Entry, pk=id)
-	ent.message.text = req.POST["text"]
-	ent.save()
+	text = req.POST["text"]
 	
-	# run the correction back through the parser,
-	# and throw an http500 (mostly to be caught
-	# by ajax) if it failed again
-	if not parse_message(ent, ent.question):
-		return HttpResponseServerError(
-			"Entry was still unparseable",
-			content_type="text/plain")
+	# a special string can be passed
+	# to drop the entry altogether
+	if text == "REJECT":
+		ent.message.delete()
+		
+	else:
+		ent.message.text = text
+		ent.save()
+	
+		# run the correction back through the parser,
+		# and throw an http500 (mostly to be caught
+		# by ajax) if it failed again
+		if not parse_message(ent, ent.question):
+			return HttpResponseServerError(
+				"Entry was still unparseable",
+				content_type="text/plain")
 	
 	# no fail = success!
 	return HttpResponse("OK", content_type="text/plain")
-
-
-def add_answer(req):
-	if req.method == "POST":
-		post = querydict_to_dict(req.POST)
-
-		post["question"] = Question.objects.get(pk=(int(post.pop("question"))))
-
-		# create the object and redirect to dashboard
-		# no error checking for now, except django's
-		# model and database constraints
-		Answer(**post).save()
-		return HttpResponseRedirect("/")
-	
-	# render the ADD form
-	return render_to_response("add-answer.html",\
-		{ "questions" : Question.objects.all() })
 
 
 def message_log(req):
 	return render_to_response("message-log.html", {
 		"messages": Message.objects.all().order_by("-pk"),
 		"tab": "log"
-	})
-
-
-def unparseables(req):
-	return render_to_response("unparseables.html", {
-		"questions": Question.have_unparseables(),
-		"tab": "unparseables"
 	})
 
