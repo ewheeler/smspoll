@@ -84,6 +84,9 @@ def add_question(req):
 	})
 
 
+from datetime import datetime
+from datetime import timedelta
+
 def is_available(req, from_str, to_str):
 	delta = timedelta(1)
 	fmt = "%Y-%m-%d"
