@@ -5,6 +5,7 @@ import kannel
 from smsapp import *
 from datetime import date, datetime
 from strings import ENGLISH as STR
+import thread, time
 
 # import the essentials of django
 from django.core.management import setup_environ
@@ -105,23 +106,7 @@ class App(SmsApplication):
 			text=msg)
 
 
-# run the application
-app = App(backend=kannel, sender_args=["user", "pass"])
-app.run()
-
-
-def broadcaster():
-	# if the current question has not been sent,
-	# broadcaster will broadcast it
-	if Question.current():
-		# do nothing if current question has already been sent
-		if Question.current().sent_to: return None
-
-		# otherwise broadcast current question
-		else: return broadcast_question(Question.current())
-
-	return None
-
+# BROADCAST FUNCTIONS ----------------------------------------------------------
 
 def broadcast_question(question):
 	# lets send SMSs with pykannel!
@@ -146,14 +131,47 @@ def broadcast_question(question):
 	for r in respondants:
 		sender.send(r.phone, broadcast)
 		sending += 1
-		print 'Blasted to %d of %d numbers...' % (sending, len(respondants))
+		print '[broadcaster] Blasted to %d of %d numbers...' % (sending, len(respondants))
 
 	# save number broadcasted to db
 	question.sent_to = sending
 	question.save()
 
-	return 'Blasted %s to %d numbers with %d failures' % (broadcast, sending, (len(respondants) - sending))
+	return '[broadcaster] Blasted %s to %d numbers with %d failures' % \
+			(broadcast, sending, (len(respondants) - sending))
 
 
-# wait for interrupt
-while True: time.sleep(1)
+def broadcaster(seconds):	
+	while True:
+		print "[broadcaster] Starting broadcast loop"
+		# if the current question has not been sent,
+		# broadcaster will broadcast it
+		if Question.current():
+			# send the question if it hasn't been sent before
+			if not Question.current().sent_to:
+				print "[broadcaster] Current question is unsent, sending new messages"
+				broadcast_question(Question.current())
+			else:
+				print "[broadcaster] Current question was already sent, no new outgoing messages"
+		# sleep for the given amount of time
+		print "[broadcaster] Going to sleep now... (%d seconds)" % seconds
+		time.sleep(seconds)
+
+
+# BROADCAST THREAD -------------------------------------------------------------
+
+print "[broadcaster] Starting up..."
+
+# interval to check for broadcasting (in seconds)
+broadcast_interval = 30
+# start a thread for broadcasting
+thread.start_new_thread(broadcaster, (broadcast_interval,))
+
+
+# MAIN APPLICATION LOOP --------------------------------------------------------
+
+print "Starting main execution loop..."
+
+# run the application
+app = App(backend=kannel, sender_args=["user", "pass"])
+app.run()
