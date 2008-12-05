@@ -68,6 +68,23 @@ body {
 			}
 
 
+
+
+/* -------------------
+   GENERAL LOOK + FEEL
+   ------------------- */
+
+h2 {
+	font-weight: normal;
+	font-size: 100%;
+	padding: 0.5em;
+	background: #f8f8f8;
+	border-bottom: 2px solid #aaa;
+}
+
+
+
+
 /* -----
    FORMS
    ----- */
@@ -119,6 +136,11 @@ form { }
 			padding: 1em;
 			margin-bottom: 1em;
 		}
+		
+			form div.submit div.errors li {
+				margin-left: 2em;
+				margin-top: 0.5em;
+			}
 		
 		/* the success div is shown while
 		 * the browser is redirecting */
@@ -219,14 +241,6 @@ form { }
 
 .dashboard { }
 	
-	.dashboard h2 {
-		font-weight: normal;
-		font-size: 100%;
-		padding: 0.5em;
-		background: #f8f8f8;
-		border-bottom: 2px solid #aaa;
-	}
-	
 	.dashboard #current,
 	.dashboard #answers {
 		margin-bottom: 2em;
@@ -294,7 +308,21 @@ form { }
 		/* spacing between columns */
 		.dashboard #answers h2,
 		.dashboard #answers ul {
-			margin-left: 2em; }
+			position: relative;
+			margin-left: 2em;
+		}
+		
+			.dashboard #answers h2 .jump-to-unparseable {
+				position: absolute;
+				top: 0; right: 0;
+				font-size: 80%;
+				line-height: 1.25;
+				float: right;
+				cursor: pointer;
+				background: #aaa;
+				padding: 0.625em;
+				color: #fff;
+			}
 
 		.dashboard #answers ul {
 			padding-right: 0.5em;
@@ -309,15 +337,20 @@ form { }
 			display: block;
 			border: 1px solid #ccc;
 			margin-top: 0.5em;
+			overflow: auto;
 		}
 		
-			/* unmoderated answers are bright red */
-			.dashboard #answers li.unmoderated {
+			/* unmoderated and unparseable answers
+			 * are bright red */
+			.dashboard #answers li.unmoderated,
+			.dashboard #answers li.unparseable {
+				border-color: #faa;
 				background: #fee;
 				color: #a00;
 			}
 			
-				.dashboard #answers li.unmoderated span {
+				.dashboard #answers li.unmoderated span,
+				.dashboard #answers li.unparseable span {
 					background: #fcc;
 					color: #f88;
 				}
@@ -337,6 +370,25 @@ form { }
 				
 				.dashboard #answers .mod-win  { background-image: url("/assets/ok.png"); }
 				.dashboard #answers .mod-fail { background-image: url("/assets/cancel.png"); }
+			
+			
+			.dashboard #answers li.unparseable { }
+				
+				.dashboard #answers li.unparseable .answers {
+					text-align: right;
+					padding: 0.25em;
+					padding-bottom: 0;
+					float: right;
+				}
+				
+					.dashboard #answers li.unparseable .answers button {
+						margin-bottom: 0.25em;
+						cursor: pointer;
+					}
+						
+					.dashboard #answers li.unparseable .answers button.reject {
+						color: #c00; }
+		
 		
 			.dashboard #answers li span {
 				display: block;
@@ -361,6 +413,7 @@ form { }
 			.dashboard #answers li p {
 				padding: 0.25em;
 				line-height: 1.4;
+				float: left;
 			}
 		
 		.dashboard #answers .no-entries {

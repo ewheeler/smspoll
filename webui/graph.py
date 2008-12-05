@@ -2,6 +2,7 @@
 # vim: noet
 
 import os, sys
+from random import choice
 from datetime import datetime, date, timedelta
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
@@ -14,8 +15,8 @@ sys.path.insert(0, os.path.join(ROOT, '..'))
 # path, from above craziness, to graphs directory
 GRAPH_DIR = 'webui/graphs/'
 
-# graph sizes to generate (big & thumb)
-GRAPH_SIZES = ['500', '240']
+# graph sizes to generate (small & big)
+GRAPH_SIZES = ['240', '500']
 
 
 def golden(width):
@@ -103,19 +104,26 @@ def graph_multiple_choice(q):
 
 	# collect the long, textual representation
 	# of the answer choice for labelling the graph
-	long_answers = []
+	# along with the choice counts of each choice
+	# for display on large graphs
+	long_answers_big = []
+	long_answers_small = []
 	for a in answers:
-		long_answers.append(a.text)
+		long_answers_small.append(a.text)
+		long_answers_big.append(a.text + ' (' + str(choices[int(a.choice)]) + ')' )
 
 	
 	for size in GRAPH_SIZES:
 		# configure and save the graph
 		bar = StackedVerticalBarChart(int(size), golden(int(size)),\
 					y_range=(0, max(choice_counts)))
-		bar.set_colours(['0091C7','0FBBD0'])
+		bar.set_colours([choice(['0091C7','0FBBD0'])])
 		bar.add_data(choice_counts)
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
-		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
+		if (size == GRAPH_SIZES[0]):
+			index = bar.set_axis_labels(Axis.BOTTOM, long_answers_small)
+		else:
+			index = bar.set_axis_labels(Axis.BOTTOM, long_answers_big)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
 		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		bar.download(filename)
@@ -158,15 +166,25 @@ def graph_boolean(q):
 		if int(e.text) in choices:
 			choices[int(e.text)] += 1
 	
-	# only two choices (unless we accept maybies)
-	long_answers = ["Nay", "Yea"]
+	# collect the long, textual representation
+	# of the answer choice for labelling the graph
+	# along with the choice counts of each choice
+	# for display on large graphs
+	long_answers_big = []
+	long_answers_small = []
+	for a in answers:
+		long_answers_small.append(a.text)
+		long_answers_big.append(a.text + ' (' + str(choices[int(a.choice)]) + ')' )
 
 	for size in GRAPH_SIZES:
 		# configure and save the graph
 		pie = PieChart2D(int(size), golden(int(size)))
 		# TODO normalize values
 		pie.add_data(choices.values())
-		pie.set_legend(long_answers)
+		if (size == GRAPH_SIZES[0]):
+			pie.set_legend(long_answers_small)
+		else:
+			pie.set_legend(long_answers_big)
 		pie.set_colours(['0091C7','0FBBD0'])
 		filename = GRAPH_DIR + str(question.pk) + '-' + size + '-entries.png'
 		pie.download(filename)
