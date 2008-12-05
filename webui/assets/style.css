@@ -303,7 +303,21 @@ form { }
 		/* spacing between columns */
 		.dashboard #answers h2,
 		.dashboard #answers ul {
-			margin-left: 2em; }
+			position: relative;
+			margin-left: 2em;
+		}
+		
+			.dashboard #answers h2 .jump-to-unparseable {
+				position: absolute;
+				top: 0; right: 0;
+				font-size: 80%;
+				line-height: 1.25;
+				float: right;
+				cursor: pointer;
+				background: #aaa;
+				padding: 0.625em;
+				color: #fff;
+			}
 
 		.dashboard #answers ul {
 			padding-right: 0.5em;
@@ -321,14 +335,17 @@ form { }
 			overflow: auto;
 		}
 		
-			/* unmoderated answers are bright red */
-			.dashboard #answers li.unmoderated {
+			/* unmoderated and unparseable answers
+			 * are bright red */
+			.dashboard #answers li.unmoderated,
+			.dashboard #answers li.unparseable {
 				border-color: #faa;
 				background: #fee;
 				color: #a00;
 			}
 			
-				.dashboard #answers li.unmoderated span {
+				.dashboard #answers li.unmoderated span,
+				.dashboard #answers li.unparseable span {
 					background: #fcc;
 					color: #f88;
 				}
@@ -348,24 +365,24 @@ form { }
 				
 				.dashboard #answers .mod-win  { background-image: url("/assets/ok.png"); }
 				.dashboard #answers .mod-fail { background-image: url("/assets/cancel.png"); }
-		
-		
-			/* unparseable answers are bright blue */
-			.dashboard #answers li.unparseable {
-				border-color: #aaf;
-				background: #eef;
-				color: #00a;
-			}
 			
-				.dashboard #answers li.unparseable span {
-					background: #ccf;
-					color: #88f;
-				}
+			
+			.dashboard #answers li.unparseable { }
 				
 				.dashboard #answers li.unparseable .answers {
+					text-align: right;
 					padding: 0.25em;
+					padding-bottom: 0;
 					float: right;
 				}
+				
+					.dashboard #answers li.unparseable .answers button {
+						margin-bottom: 0.25em;
+						cursor: pointer;
+					}
+						
+					.dashboard #answers li.unparseable .answers button.reject {
+						color: #c00; }
 		
 		
 			.dashboard #answers li span {

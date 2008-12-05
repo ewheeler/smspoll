@@ -22,9 +22,11 @@
 				<div class="answers bool">
 					<button value="yes">Yes</button>
 					<button value="no">No</button>
+					<button value="REJECT" class="reject">Reject</button>
 				</div>{% endifequal%}{% ifequal question.type "M" %}
 				<div class="answers mc">{% for answer in question.answer_set.all %}
 					<button value="{{ answer.choice }}">{{ answer.text }}</button>{% endfor %}
+					<button value="REJECT" class="reject">Reject</button>
 				</div>{% endifequal %}{% endif %}
 			</li>{% endfor %}
 		</ul>{% else %}
@@ -93,11 +95,19 @@
 							
 							/* the entry was corrected, so remove
 							 * the UNPARSEABLE highlight, buttons,
-							 * and update the caption */
+							 * and update the caption (or delete
+							 * the entry, if it were rejected) */
 							"onSuccess": function() {
-								li.removeClass("unparseable");
-								li.getElements("div").dispose();
-								li.getElement("p").set("text", button.get("text"));
+								if (button.get("value")!="REJECT") {
+									li.removeClass("unparseable");
+									li.getElements("div").dispose();
+									li.getElement("p").set("text", button.get("text"));
+								} else li.dispose();
+								
+								/* if we just removed the last
+								 * unparseable, remove the jump */
+								if($$("#answers li.unparseable").length == 0)
+									$$("#answers div.jump-to-unparseable").dispose();
 							},
 							
 							/* something went wrong! we have no
@@ -108,6 +118,27 @@
 						}).send();
 					});				
 				});
+				
+				if($$("#answers li.unparseable").length) {
+					var scroller = $$("#answers ul")[0];
+							
+					new Element("div", {
+						"html": "Next unparseable",
+						"class": "jump-to-unparseable",
+						"events": { "click": function(ev) {
+							
+							/* find the next available unparseable */
+							var lis = $$("#answers li.unparseable");
+							if(lis.length > 0) {
+								
+								/* scroll it into view */
+								var pos = lis[0].getPosition(scroller);
+								scroller.scrollTo(0, (pos.y - 5));
+							}
+							
+						}}
+					}).inject($$("#answers h2")[0], "top");
+				}
 			});
 		</script>
 	</div>

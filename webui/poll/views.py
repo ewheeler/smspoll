@@ -165,16 +165,24 @@ def correction(req, id):
 
 	# update the Entry and Message objects
 	ent = get_object_or_404(Entry, pk=id)
-	ent.message.text = req.POST["text"]
-	ent.save()
+	text = req.POST["text"]
 	
-	# run the correction back through the parser,
-	# and throw an http500 (mostly to be caught
-	# by ajax) if it failed again
-	if not parse_message(ent, ent.question):
-		return HttpResponseServerError(
-			"Entry was still unparseable",
-			content_type="text/plain")
+	# a special string can be passed
+	# to drop the entry altogether
+	if text == "REJECT":
+		ent.message.delete()
+		
+	else:
+		ent.message.text = text
+		ent.save()
+	
+		# run the correction back through the parser,
+		# and throw an http500 (mostly to be caught
+		# by ajax) if it failed again
+		if not parse_message(ent, ent.question):
+			return HttpResponseServerError(
+				"Entry was still unparseable",
+				content_type="text/plain")
 	
 	# no fail = success!
 	return HttpResponse("OK", content_type="text/plain")
