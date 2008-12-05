@@ -16,6 +16,7 @@ setup_environ(settings)
 # somewhere sensible at the earliest opportunity
 from webui.poll.models import *
 from webui import utils
+from webui import graph
 
 
 class App(SmsApplication):
@@ -73,7 +74,10 @@ class App(SmsApplication):
 		parsed = utils.parse_message(self.log_msg, ques)
 
 		# send an appropriate response to the caller
-		if parsed:	self.respond(STR["thanks"])
+		if parsed:	
+			graph.graph_entries(ques)
+			self.respond(STR["thanks"])
+
 		else:       self.respond(STR["thanks_unparseable"])
 
 
@@ -104,6 +108,51 @@ class App(SmsApplication):
 # run the application
 app = App(backend=kannel, sender_args=["user", "pass"])
 app.run()
+
+
+def broadcaster():
+	# if the current question has not been sent,
+	# broadcaster will broadcast it
+	if Question.current():
+		# do nothing if current question has already been sent
+		if Question.current().sent_to: return None
+
+		# otherwise broadcast current question
+		else: return broadcast_question(Question.current())
+
+	return None
+
+
+def broadcast_question(question):
+	# lets send SMSs with pykannel!
+	sender = kannel.SmsSender("user", "password")
+
+	# gather active respondants
+	respondants = Respondant.objects.filter(is_active=True)
+	sending = 0
+
+	# message to be blasted
+	broadcast = question.text
+
+	# unless this is a free text question,
+	# add the answer choices to the broadcast message
+	if question.type != 'F':
+		answers = Answer.objects.filter(question=question.pk)
+		for a in answers:
+			broadcast = broadcast + '\n ' + a.choice + ' - ' + a.text
+
+	# blast the broadcast message to our active respondants
+	# and increment the counter
+	for r in respondants:
+		sender.send(r.phone, broadcast)
+		sending += 1
+		print 'Blasted to %d of %d numbers...' % (sending, len(respondants))
+
+	# save number broadcasted to db
+	question.sent_to = sending
+	question.save()
+
+	return 'Blasted %s to %d numbers with %d failures' % (broadcast, sending, (len(respondants) - sending))
 
 
 # wait for interrupt
