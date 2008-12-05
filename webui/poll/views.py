@@ -293,11 +293,12 @@ def graph_multiple_choice(q):
 	for a in answers:
 		long_answers.append(a.text)
 
+
 	for size in GRAPH_SIZES:
 		# configure and save the graph
 		bar = StackedVerticalBarChart(int(size), golden(int(size)))
 		bar.set_colours(['0091C7','0FBBD0'])
-		bar.add_data(choices.values())
+		bar.add_data(sortedDictValues1(choices))
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
 		index = bar.set_axis_labels(Axis.BOTTOM, long_answers)
 		bar.set_axis_style(index, '202020', font_size=9, alignment=0)
@@ -306,6 +307,12 @@ def graph_multiple_choice(q):
 		print 'saved ' + filename
 	
 	return 'graphed entries ' + question.text
+
+
+def sortedDictValues1(adict):
+	items = adict.items()
+	items.sort()
+	return [value for key, value in items]
 
 
 def graph_boolean(q):
