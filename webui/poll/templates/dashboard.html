@@ -5,8 +5,10 @@
 
 <div class="dashboard">
 	<div id="current">
-		<h2>Current Question</h2>{% if question %}
+		{% if question %}
+		<h2>Question{% if question.is_current %} (Current){% endif %}</h2>
 		{% question_full question %}{% else %}
+		<h2>No Question</h2>
 		<div class="no-current">
 			No question is currently active.
 		</div>{% endif %}
@@ -17,7 +19,7 @@
 		<ul>{% for entry in entries %}
 			<li{% if not entry.moderated %} class="unmoderated"{% endif %} id="ent-{{ entry.pk }}">
 				<span>{{ entry.meta_data }}</span>
-				<p>{{ entry.text }}</p>
+				<p>{{ entry.display_text }}</p>
 			</li>{% endfor %}
 		</ul>{% else %}
 		<div class="no-entries">
