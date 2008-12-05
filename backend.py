@@ -15,8 +15,7 @@ setup_environ(settings)
 # import the django models, which should be movd
 # somewhere sensible at the earliest opportunity
 from webui.poll.models import *
-from webui import utils
-from webui import graph
+from webui import utils, graph
 
 
 class App(SmsApplication):
