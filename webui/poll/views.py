@@ -125,9 +125,9 @@ def is_available(req, from_str, to_str):
 	# to be displayed by ajax (or seen by a low-
 	# tech or non-js browser)
 	if len(taken):
-		errs = ["  %s by %s" % (day.strftime(fmt), q) for q, day in taken]
+		errs = ["<li>%s by %s</li>" % (day.strftime(fmt), q) for q, day in taken]
 		return HttpResponseServerError(
-			"The following dates are already reserved:\n" + "\n".join(errs),
+			"The following dates are already reserved:\n<ul>\n" + "\n".join(errs) + "\n</ul>",
 			content_type="text/plain")
 	
 	# no dates were taken, so this range is fine

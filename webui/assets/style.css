@@ -137,6 +137,11 @@ form { }
 			margin-bottom: 1em;
 		}
 		
+			form div.submit div.errors li {
+				margin-left: 2em;
+				margin-top: 0.5em;
+			}
+		
 		/* the success div is shown while
 		 * the browser is redirecting */
 		form div.submit div.success {
