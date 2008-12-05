@@ -15,7 +15,7 @@ urlpatterns = patterns('',
 	
 	# graphs are generated and stored to be viewed statically
     (r'^graphs/(?P<path>.*)$', "django.views.static.serve",
-        {"document_root": os.path.dirname(__file__) + "/poll/graphs"}),
+        {"document_root": os.path.dirname(__file__) + "/graphs"}),
 
 	# poll views (move to poll/urls.py)
 	(r'^$', pv.dashboard),
