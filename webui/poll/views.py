@@ -41,11 +41,8 @@ def dashboard(req, id=None):
 	
 	# show all of the answers related to this
 	# question. these have already been filtered
-	# by the backend, but not moderated. unparseable
-	# entries are stored in the Entry object (which
-	# is kind of a hack), so we filter those out until
-	# they're fixed on the "unparseables" page
-	if ques: entries = ques.entry_set.filter(is_unparseable=False)
+	# by the backend, but not moderated or parsed
+	if ques: entries = ques.entry_set.all()
 	else: entries = []
 
 	return render_to_response("dashboard.html", {
@@ -183,34 +180,10 @@ def correction(req, id):
 	return HttpResponse("OK", content_type="text/plain")
 
 
-def add_answer(req):
-	if req.method == "POST":
-		post = querydict_to_dict(req.POST)
-
-		post["question"] = Question.objects.get(pk=(int(post.pop("question"))))
-
-		# create the object and redirect to dashboard
-		# no error checking for now, except django's
-		# model and database constraints
-		Answer(**post).save()
-		return HttpResponseRedirect("/")
-	
-	# render the ADD form
-	return render_to_response("add-answer.html",\
-		{ "questions" : Question.objects.all() })
-
-
 def message_log(req):
 	return render_to_response("message-log.html", {
 		"messages": Message.objects.all().order_by("-pk"),
 		"tab": "log"
-	})
-
-
-def unparseables(req):
-	return render_to_response("unparseables.html", {
-		"questions": Question.have_unparseables(),
-		"tab": "unparseables"
 	})
 
 
