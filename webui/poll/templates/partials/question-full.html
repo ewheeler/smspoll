@@ -1,6 +1,10 @@
-<div class="q-full">
-	<img src="/graphs/{{question.pk}}-500-entries.png"/>
+<div class="q-full" id="qf-{{ rnd }}">
 	<h3>{{ question.text }}</h3>
 	<p class="dates">{{ question.start|date:"D M jS Y" }} - {{ question.end|date:"D M jS Y" }}</p>
 </div>
+<script type="text/javascript">
+	var c = $("qf-{{ rnd }}");
+	var data = {{ data|safe }};
+	new Smspoll.Pie(c, data);
+</script>
 

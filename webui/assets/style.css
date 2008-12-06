@@ -286,9 +286,17 @@ form { }
 		 * of the image might be re-jigged by javascript :)
 		 */
 		 
-		.dashboard #current img {
-			/*height: 24.58em;*/
+		.dashboard #current div.graph {
+			position: relative;
+			height: 24.58em;
+			margin: 0.5em 0;
 		}
+		
+			.dashboard #current div.graph embed,
+			.dashboard #current div.graph object {
+				position: absolute;
+				top: 0; left: 0;
+			}
 		
 		.dashboard .no-current {
 			background: #ddd;
@@ -427,8 +435,8 @@ form { }
 			color: #aaa;
 			
 			/* here be dragons  */
-			line-height: 35.625em;
-			height: 35.625em;
+			line-height: 35.5em;
+			height: 35.5em;
 		}
 		
 	
@@ -481,6 +489,11 @@ form { }
 				.dashboard .summaries.num-10 { width: 2450px; }
 				.dashboard .summaries.num-11 { width: 2695px; }
 				.dashboard .summaries.num-12 { width: 2940px; }
+				
+				.dashboard .summaries .graph {
+					margin-bottom: 5px;
+					height: 8em;
+				}
 	
 			/* match the height of a summaries box,
 			 * by combining 100px (img:graph:height),

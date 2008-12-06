@@ -24,9 +24,11 @@ urlpatterns = patterns('',
 	(r'^log$', pv.message_log),
 	
 	# ajax
+	(r'^question/(?P<id>\d+).json$', pv.question_json),
+	(r'^question/(?P<id>\d+)/entries.json$', pv.entries_json),
 	(r'^moderate/(?P<id>\d+)/(?P<status>win|fail)$', pv.moderate),
-	(r'^correct/(?P<id>\d+)$', pv.correction),\
-
+	(r'^correct/(?P<id>\d+)$', pv.correction),
+	
     # enable the django magic admin
     (r'^admin/(.*)', admin.site.root),
 )

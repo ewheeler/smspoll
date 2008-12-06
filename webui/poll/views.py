@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: noet
 
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.db import IntegrityError
@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from models import *
 from utils import *
 
+@require_GET
 def dashboard(req, id=None):
 
 	# if a pk was passed in the url, then
@@ -34,6 +35,30 @@ def dashboard(req, id=None):
 		"tab": "dashboard"
 	})
 
+
+from django.utils import simplejson
+
+@require_GET
+def question_json(req, id):
+	q = get_object_or_404(Question, pk=id)
+	return HttpResponse(
+		simplejson.dumps(q.results()),
+		mimetype="text/plain")
+
+@require_GET
+def entries_json(req, id):
+	q = get_object_or_404(Question, pk=id)
+	entries = q.entry_set.filter(is_unparseable=False)
+	
+	# return a text/timestamp array 
+	return HttpResponse(
+		simplejson.dumps([
+			(entry.text, entry.time.isoformat())
+			for entry in entries
+		]),
+		mimetype="text/plain")
+	
+	
 
 def add_question(req):
 	

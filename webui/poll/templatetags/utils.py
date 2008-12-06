@@ -2,11 +2,18 @@ from django.template import Library
 from poll.models import *
 register = Library()
 
-# for date_selector
-from django.utils.dates import MONTHS
-import time
+
+# UTIL -----------------------------------------------------
+
+def rand():
+	from random import randint
+	return randint(111111,999999)
+
 
 # INCLUSION TAGS --------------------------------------------
+
+from django.utils.dates import MONTHS
+import time
 
 @register.inclusion_tag("partials/date-selector.html")
 def date_selector(prefix):
@@ -20,20 +27,25 @@ def date_selector(prefix):
 	}
 
 
-@register.inclusion_tag("partials/question-summary.html")
-def question_summary(question):
-	return { "question" : question }
+def question_data(question):
+	from django.utils import simplejson
+	data = [(answer.text, votes) for answer, votes in question.results()]
+	return { "question" : question, "rnd": rand(), "data": simplejson.dumps(data) }
 
+@register.inclusion_tag("partials/question-summary.html")
+def question_summary(question):	
+	return question_data(question)
 
 @register.inclusion_tag("partials/question-full.html")
 def question_full(question):
-	return { "question" : question }
+	return question_data(question)
 
 
 @register.inclusion_tag("partials/add-answer.html")
 def add_answer(number):
 	return { "questions" : Question.objects.all(),\
 				"number" : number }
+
 
 # SIMPLE TAGS -----------------------------------------------
 
