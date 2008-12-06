@@ -19,7 +19,28 @@ function open_flash_chart_data(id) {
  * global functions to hide in */
 var Smspoll = {
 	"Pie": new Class({
-		"initialize": function(into, values) {
+		"build_data": function(ofc_values) {
+		
+			/* build the configuration array that
+			 * open flash chart wants (it's kind of
+			 * dirty, presentation mixed up wit data) */
+			 
+			return({
+				"elements": [{
+					"type": "pie",
+					"values": ofc_values,
+					"tip": "#val# of #total#<br>#percent#",
+					"colours": ["#cc0000", "#00cc00", "#0000cc", "#cccc00", "#cc00cc", "#00cccc"],
+					"start-angle": 90,
+					"animate": false
+				}],
+				
+				"x_axis": null,
+				"y_axis": null
+			});
+		},
+		
+		"expand_values": function(values) {
 			
 			/* ofc requires an array of hashes, which is
 			 * a bit long-winded and repetitive. rather
@@ -34,44 +55,33 @@ var Smspoll = {
 				});
 			});
 			
-			
-			/* build the configuration array that
-			 * open flash chart wants (it's kind of
-			 * dirty, presentation all mixed up with
-			 * data), and stash it in a global (omfg
-			 * teh fail), to be plucked* out later */
-			var key = window["ofcd"].getLength()
-			window["ofcd"][key] = {
-				"elements": [{
-					"type": "pie",
-					"values": ofc_values,
-					"tip": "#val# of #total#<br>#percent#",
-					"colours": ["#cc0000", "#00cc00", "#0000cc", "#cccc00", "#cc00cc", "#00cccc"],
-					"start-angle": 90,
-					"animate": false
-				}],
-				
-				"x_axis": null,
-				"y_axis": null
-			};;
-			
+			return ofc_values;
+		},
+		
+		"initialize": function(into, values) {
+		
+			/* stash the values in a global (omfg
+			 * teh fail), to be plucked out later
+			 * by the open_flash_chart_data func */
+			var key = window["ofcd"].getLength();
+			var ofc_values = this.expand_values(values);
+			window["ofcd"][key] = this.build_data(ofc_values);
 			
 			/* create a div to inject the graph
 			 * dynamically, to avoid weird gaps
 			 * in the page if JS is disabled */
-			var container = new Element("div", {
+			this.container = new Element("div", {
 				"class": "graph"
 			}).inject(into, "top");
-			var size = container.getSize();
-			
+			var size = this.container.getSize();
 
 			/* insert a pretty graph to display the
 			 * results. what? flash is an open standard,
 			 * even if the IDE isn't. i hope this works
 			 * in gnash. not that i have the proprietary
 			 * player installed on my laptop or anything */
-			var swf = new Swiff("/assets/open-flash-chart.swf", {
-				"container": container,
+			this.swf = new Swiff("/assets/open-flash-chart.swf", {
+				"container": this.container,
 				"width": size.x,
 				"height": size.y,
 				"vars": {
@@ -80,19 +90,23 @@ var Smspoll = {
 				}
 			});
 			
-			
 			/* when the window is resized (including the text
 			 * size, in most browsers), the container might
 			 * have been resized in turn, so update the size
 			 * of the flash object */
-			$(window).addEvent("resize", function() {
-				var size = container.getSize();
-				swf.object.height = size.y;
-				swf.object.width = size.x;
-			});
+			$(window).addEvent("resize", (function() {
+				var size = this.container.getSize();
+				this.swf.object.height = size.y;
+				this.swf.object.width = size.x;
+			}).bind(this));
 			
+			this.swf["repopulate"] = (function(values) {
+				var ofc_values = this.expand_values(values);
+				var data = this.build_data(ofc_values);
+				this.swf.object.load(JSON.encode(data));
+			}).bind(this);
 			
-			return swf;
+			return this.swf;
 		}
 	})
 };
