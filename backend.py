@@ -19,7 +19,9 @@ from webui.poll.models import *
 from webui import utils, graph
 
 
-class App(SmsApplication):
+
+
+class SmsPoll(SmsApplication):
 	kw = SmsKeywords()
 
 	def __get(self, model, **kwargs):
@@ -78,7 +80,8 @@ class App(SmsApplication):
 			graph.graph_entries(ques)
 			self.respond(STR["thanks"])
 
-		else:       self.respond(STR["thanks_unparseable"])
+		else:
+			self.respond(STR["thanks_unparseable"])
 
 
 	# LOGGING -----------------------------------------------------------------
@@ -103,6 +106,15 @@ class App(SmsApplication):
 			is_outgoing=True,
 			phone=caller,
 			text=msg)
+
+
+
+
+# start up the application asap, so the broadcast
+# threads have 'app' in their scope (just for logging)
+app = SmsPoll(backend=kannel, sender_args=["user", "pass"])
+
+
 
 
 # BROADCAST FUNCTIONS ----------------------------------------------------------
@@ -140,37 +152,51 @@ def broadcast_question(question):
 			(broadcast, sending, (len(respondants) - sending))
 
 
-def broadcaster(seconds):	
+def broadcaster(seconds=60, wake_hour=8, sleep_hour=21):
+	app.log("Starting Broadcaster...", "init")
 	while True:
-		print "[broadcaster] Starting broadcast loop"
-		# if the current question has not been sent,
-		# broadcaster will broadcast it
-		if Question.current():
-			# send the question if it hasn't been sent before
-			if not Question.current().sent_to:
-				print "[broadcaster] Current question is unsent, sending new messages"
-				broadcast_question(Question.current())
-			else:
-				print "[broadcaster] Current question was already sent, no new outgoing messages"
-		# sleep for the given amount of time
-		print "[broadcaster] Going to sleep now... (%d seconds)" % seconds
+		
+		# only broadcast while people are awake. otherwise, we'll be sending
+		# people messages at 12:01AM, which probably won't go down so well
+		hour = time.localtime()[3]
+		if wake_hour < hour < sleep_hour:
+			
+			# if the current question has not been sent,
+			# broadcaster will broadcast it
+			q = Question.current()
+			if q:
+			
+				# if this question hasn't been 'sent_to' anyone yet,
+				# we can assume that it should be broadcast now
+				if not q.sent_to:
+					app.log("Broadcasting new question")
+					broadcast_question(q)
+				
+				# already sent, so we have nothing to do
+				# i don't think we really need to log this...
+				#else: app.log("Current question was already broadcast")
+				else: pass
+			
+			# when in production, there should probably ALWAYS
+			# be an active question; otherwise, anyone texting
+			# in will receive an error -- so highlight this
+			# as a warning in the screen log
+			else: app.log("No current question", "warn")
+		
+		# we are outside of waking hours, so do nothing
+		else:
+			app.log("Broadcast disabled from %d:00 to %d:00" %\
+			        (sleep_hour, wake_hour))
+		
+		# wait until it's time
+		# to check again (60s)
 		time.sleep(seconds)
 
 
-# BROADCAST THREAD -------------------------------------------------------------
-
-print "[broadcaster] Starting up..."
-
-# interval to check for broadcasting (in seconds)
-broadcast_interval = 30
-# start a thread for broadcasting
-thread.start_new_thread(broadcaster, (broadcast_interval,))
 
 
 # MAIN APPLICATION LOOP --------------------------------------------------------
 
-print "Starting main execution loop..."
-
-# run the application
-app = App(backend=kannel, sender_args=["user", "pass"])
+thread.start_new_thread(broadcaster, ())
 app.run()
+
