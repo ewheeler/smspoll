@@ -59,63 +59,121 @@ def entries_json(req, id):
 		mimetype="text/plain")
 	
 	
-
-def add_question(req):
+@require_GET
+def manage_questions(req, id=None):
 	
-	# if we are POSTing, create the object
-	# (and children) before redirecting
-	if req.method == "POST":
-		p = req.POST
-		try:
-			# extract the date range from the query dict
-			start_str = "%4d-%02d-%02d" % (int(p["start-year"]), int(p["start-month"]), int(p["start-day"]))
-			end_str   = "%4d-%02d-%02d" % (int(p["end-year"]), int(p["end-month"]), int(p["end-day"]))
-			
-			# before saving, check that the dates are
-			# available (although this should have already been
-			# done on the client side by ajax, we must check)
-			avail = is_available(None, start_str, end_str)
-			if isinstance(avail, HttpResponseServerError):
-				return avail
-			
-			q = object_from_querydict(Question, req.POST)
-			q.save()
-			
-			# for multiple choice questions, also
-			# create the linked Answer objects
-			if q.type == "M":
-				for n in range(1, 5):
-					object_from_querydict(
-						Answer,
-						req.POST,
-						{ "question": q },
-						("-%s" % n)
-					).save()
-			
-			# redirect to the dashboard
-			return HttpResponseRedirect("/")
+	# no argument = add a question
+	# and list existing questions
+	if id is None:
+		ques = None
+	
+	# argument = edit an existing
+	# question (although COMPLEX
+	# LOGIC will apply here)
+	else:
+		ques = get_object_or_404(Question, pk=id)
+		answers = ques.answers()
 		
-		# something went wrong during object creation.
-		# this should have been caught by javascript,
-		# so halt with a low-tech error
-		except IntegrityError, err:
-			return HttpResponseServerError(
-				"\n".join(list(e[1] for e in err)),
-				content_type="text/plain")
+		# this is really dumb. django templates can't
+		# deal with arrays, so we're forced to move
+		# the answers into Q attributes, for now
+		for n in range(0, len(answers)):
+			setattr(ques, ("answer_%d" % (n+1)), answers[n])
 	
 	# otherwise, just render the ADD form
-	return render_to_response("add-question.html", {
-		"tab": "add-question"
+	return render_to_response("questions.html", {
+		"questions": Question.objects.all().order_by("start"),
+		"question": ques,
+		"tab": "questions"
 	})
+
+
+def extract_dates(qd):
+	"""Extract a date range from a query dict, return as a (start,end) tuple of strings"""
+	start_str = "%4d-%02d-%02d" % (int(qd["start-year"]), int(qd["start-month"]), int(qd["start-day"]))
+	end_str   = "%4d-%02d-%02d" % (int(qd["end-year"]), int(qd["end-month"]), int(qd["end-day"]))
+	return (start_str, end_str)
+	
+
+@require_POST
+def add_question(req):
+	p = req.POST
+	
+	try:
+		
+		# before saving, check that the dates are
+		# available (although this should have already been
+		# done on the client side by ajax, we must check)
+		avail = is_available(None, *extract_dates(p))
+		if isinstance(avail, HttpResponseServerError):
+			return avail
+		
+		q = object_from_querydict(Question, p)
+		q.save()
+		
+		# for multiple choice questions, also
+		# create the linked Answer objects
+		if q.type == "M":
+			for n in range(1, 5):
+				object_from_querydict(
+					Answer,
+					req.POST,
+					{ "question": q },
+					("-%s" % n)
+				).save()
+		
+		# redirect to the dashboard
+		return HttpResponseRedirect("/")
+	
+	# something went wrong during object creation.
+	# this should have been caught by javascript,
+	# so halt with a low-tech error
+	except IntegrityError, err:
+		return HttpResponseServerError(
+			"\n".join(list(e[1] for e in err)),
+			content_type="text/plain")
+
+
+@require_POST
+def edit_question(req, id):
+	ques = get_object_or_404(Question, pk=id)
+	p = req.POST
+	
+	try:
+		
+		# check availability of new dates
+		avail = is_available(None, *extract_dates(p), ignore=ques)
+		if isinstance(avail, HttpResponseServerError):
+			return avail
+		
+		# save the new fields
+		# not all key/values make sense to edit (such as
+		# changing the dates on a past question), but we'll
+		# check that on the client side, for the time being
+		# TODO: proper sanity checks here
+		q = update_via_querydict(ques, p)
+		q.save()
+		
+		# redirect to the dashboard
+		return HttpResponseRedirect("/")
+		
+	# something went wrong, so blow up
+	# (which should be caught by ajax)
+	except IntegrityError, err:
+		return HttpResponseServerError(
+			"\n".join(list(e[1] for e in err)),
+			content_type="text/plain")
+	
 
 
 from datetime import datetime
 from datetime import timedelta
 
-def is_available(req, from_str, to_str):
+def is_available(req, from_str, to_str, ignore=None):
 	delta = timedelta(1)
 	fmt = "%Y-%m-%d"
-
+	out_fmt = "%d %B %Y"
+	
 	# parse into date objects
 	day = datetime.strptime(from_str, fmt)
 	last = datetime.strptime(to_str, fmt)
@@ -124,7 +182,12 @@ def is_available(req, from_str, to_str):
 	while(day <= last):
 		q = Question.on(day)
 		if q is not None:
-			taken.append((q, day))
+			
+			# if we are not ignoring any questions,
+			# or Q is NOT the one we're ignoring,
+			# then add it to the list
+			if (ignore is None) or (ignore!=q):
+				taken.append((q, day))
 		
 		# next day
 		day += delta
@@ -135,7 +198,7 @@ def is_available(req, from_str, to_str):
 	# to be displayed by ajax (or seen by a low-
 	# tech or non-js browser)
 	if len(taken):
-		errs = ["<li>%s by %s</li>" % (day.strftime(fmt), q) for q, day in taken]
+		errs = ["<li><span>%s</span> by <em><a href=\"/question/%d\">%s</a></em></li>" % (day.strftime(out_fmt), q.pk, q) for q, day in taken]
 		return HttpResponseServerError(
 			"The following dates are already reserved:\n<ul>\n" + "\n".join(errs) + "\n</ul>",
 			content_type="text/plain")

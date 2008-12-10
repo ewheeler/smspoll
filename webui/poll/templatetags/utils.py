@@ -13,17 +13,29 @@ def rand():
 # INCLUSION TAGS --------------------------------------------
 
 from django.utils.dates import MONTHS
-import time
+import datetime, time
 
 @register.inclusion_tag("partials/date-selector.html")
-def date_selector(prefix):
-	now = time.localtime()
+def date_selector(prefix, date=None, disabled=False):
+	
+	# if no date was provided, select TODAY
+	if date == None:
+		t = time.localtime()
+	
+	# if a date was provided (such as a Question.start
+	# or .end), extract the values to prepopulate <select>s
+	elif isinstance(date, datetime.date):
+		t = date.timetuple()
+	
+	# we have no idea what was passed
+	else: raise Exception("wat")
 	
 	return {
 		"prefix": prefix,
-		"days":   list((d, d==now.tm_mday) for d in range(1, 32)),
-		"months": list((unicode(MONTHS[m]), m==now.tm_mon) for m in MONTHS.iterkeys()),
-		"years":  list((y, y==now.tm_year) for y in range(now.tm_year, now.tm_year+5))
+		"disabled": disabled,
+		"days":   list((d, d==t.tm_mday) for d in range(1, 32)),
+		"months": list((unicode(MONTHS[m]), m==t.tm_mon) for m in MONTHS.iterkeys()),
+		"years":  list((y, y==t.tm_year) for y in range(t.tm_year, t.tm_year+5))
 	}
 
 
