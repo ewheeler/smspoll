@@ -142,7 +142,8 @@ def edit_question(req, id):
 	try:
 		
 		# check availability of new dates
-		avail = is_available(None, *extract_dates(p), ignore=ques)
+		start, end = extract_dates(p)
+		avail = is_available(None, start, end, ignore=ques)
 		if isinstance(avail, HttpResponseServerError):
 			return avail
 		
