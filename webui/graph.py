@@ -2,6 +2,7 @@
 # vim: noet
 
 import os, sys
+from random import choice
 from datetime import datetime, date, timedelta
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
@@ -116,7 +117,7 @@ def graph_multiple_choice(q):
 		# configure and save the graph
 		bar = StackedVerticalBarChart(int(size), golden(int(size)),\
 					y_range=(0, max(choice_counts)))
-		bar.set_colours(['0091C7','0FBBD0'])
+		bar.set_colours([choice(['0091C7','0FBBD0'])])
 		bar.add_data(choice_counts)
 		bar.set_bar_width(int(int(size)/(len(choices)+1)))
 		if (size == GRAPH_SIZES[0]):
