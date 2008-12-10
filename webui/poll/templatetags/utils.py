@@ -33,6 +33,13 @@ def date_selector(prefix, date=None, disabled=False):
 	return {
 		"prefix": prefix,
 		"disabled": disabled,
+		
+		# for hidden fields
+		"year":   t.tm_year,
+		"month":  t.tm_mon,
+		"day":    t.tm_mday,
+		
+		# for drop-down selects
 		"days":   list((d, d==t.tm_mday) for d in range(1, 32)),
 		"months": list((unicode(MONTHS[m]), m==t.tm_mon) for m in MONTHS.iterkeys()),
 		"years":  list((y, y==t.tm_year) for y in range(t.tm_year, t.tm_year+5))

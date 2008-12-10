@@ -90,9 +90,26 @@ def manage_questions(req, id=None):
 
 def extract_dates(qd):
 	"""Extract a date range from a query dict, return as a (start,end) tuple of strings"""
-	start_str = "%4d-%02d-%02d" % (int(qd["start-year"]), int(qd["start-month"]), int(qd["start-day"]))
-	end_str   = "%4d-%02d-%02d" % (int(qd["end-year"]), int(qd["end-month"]), int(qd["end-day"]))
-	return (start_str, end_str)
+	start = end = None
+	
+	# attempt to extract "start", or
+	# fall back to the None
+	try:
+		start = "%4d-%02d-%02d" % (
+			int(qd["start-year"]),
+			int(qd["start-month"]),
+			int(qd["start-day"]))
+	except: pass
+	
+	# as above, for END
+	try:
+		end = "%4d-%02d-%02d" % (
+			int(qd["end-year"]),
+			int(qd["end-month"]),
+			int(qd["end-day"]))
+	except: pass
+	
+	return (start, end)
 	
 
 @require_POST
@@ -122,8 +139,9 @@ def add_question(req):
 					("-%s" % n)
 				).save()
 		
-		# redirect to the dashboard
-		return HttpResponseRedirect("/")
+		# TODO: proper ajax response
+		return HttpResponse("Question %d added" % (q.pk),
+			content_type="text/plain")
 	
 	# something went wrong during object creation.
 	# this should have been caught by javascript,
@@ -141,8 +159,8 @@ def edit_question(req, id):
 	
 	try:
 		
-		# check availability of new dates
-		start, end = extract_dates(p)
+		# check availability of new dates, if they were provided
+		start, end = extract_dates(p) # not inline, for python 2.5
 		avail = is_available(None, start, end, ignore=ques)
 		if isinstance(avail, HttpResponseServerError):
 			return avail
@@ -155,8 +173,9 @@ def edit_question(req, id):
 		q = update_via_querydict(ques, p)
 		q.save()
 		
-		# redirect to the dashboard
-		return HttpResponseRedirect("/")
+		# TODO: proper ajax response
+		return HttpResponse("Question %d edited" % (q.pk),
+			content_type="text/plain")
 		
 	# something went wrong, so blow up
 	# (which should be caught by ajax)
